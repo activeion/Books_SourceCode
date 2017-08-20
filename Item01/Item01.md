@@ -54,7 +54,7 @@ const int &rx = x;
  f(rx);   // T 的类型为const int, ParamType的类型为const int&
 ```
 值得注意的是f(rx)，rx是引用类型，但是编译器会把引用忽略，然后用去掉引用后的参数类型来匹配T 。如果ParamType为右值引用，推断的原则也是相同。但是如果为const引用，就会与上面的结果有点不一样，参考下面的例子。
-
+```
 template <typename T>
 void f(const T& param);
 ```
@@ -164,17 +164,22 @@ constexpr std::size_t arraySize(T (&)[N]) noexcept
 
 因为函数像数组一样可以转化为指针，所以函数作为参数与数组类似，例子如下
 
-void someFunc(int, double); 
+`void someFunc(int, double); `
+
 情况3 
+```
 template <typename T> 
 void f1(T param)； 
+```
 情况1 
+```
 template <typename T> 
 void f(T& param)；
 
 f1(someFunc); // 传值，ParamType 类型为void (*)(int, double)
 
 f2(someFunc); // 引用语义，ParamType类型为void (&)(int, double)
+```
 
 ## 总结
 
