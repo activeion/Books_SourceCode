@@ -120,19 +120,19 @@ const int &rx = x;
 ```
 和之前的例子一样
 ```
-f(x);  // 易知T和ParamType的类型都是int
+f(x);   // 易知T和ParamType的类型都是int
 f(cx);  // 忽略const，T和ParamType的类型都是int
-f(rx);`  // 忽略了引用后再忽略const,T和ParamType的类型都是int
+f(rx);  // 忽略了引用后再忽略const,T和ParamType的类型都是int
 ```
 虽说cx和rx都是const修饰的，但是param是值语义，所以param只是拷贝了cx和rx的值，并可以改变值。这就是为什么会忽略const，因为传进的参数expr 尽管不可以改变值，但并不意味着他们的拷贝不可以。
 
 如果我们定义一个指向常量的常量指针 
-const char* const ptr = "Fun with pointers"; 
+`const char* const ptr = "Fun with pointers"; `
 然后调用函数 
-f(ptr); 
-这个时候T 和 ParamType的类型会被推断为const char *，这是因为这种情况下传入的参数都会被函数拷贝并可以改变的，所以指针是可以指向不同的地址，个人理解在情况3是只会忽略 顶层const，然后保留 底层const。
+`f(ptr);` 
+这个时候T 和 ParamType的类型会被推断为`const char *`，这是因为这种情况下传入的参数都会被函数拷贝并可以改变的，所以指针是可以指向不同的地址，个人理解在情况3是只会忽略 顶层const，然后保留 底层const。
 
-数组作为参数
+## 数组作为参数
 
 在情况3下，如果传入的参数是数组，会转化为指针类型，例如 
 ```
@@ -160,7 +160,7 @@ constexpr std::size_t arraySize(T (&)[N]) noexcept
 ```
 因为这个模板函数是constexpr修饰的，所以他的结果可以在编译时期得到，所以可以用来初始化变量。
 
-函数作为参数
+## 函数作为参数
 
 因为函数像数组一样可以转化为指针，所以函数作为参数与数组类似，例子如下
 
