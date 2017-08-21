@@ -15,23 +15,23 @@ int main(void)
     const auto& rx =x; 
 
     auto&& uref1 = x;   //x是int，并且是左值，                     
-    //所以uref1的类型是int&  
+                        //所以uref1的类型是int&  
     auto&& uref2 = cx;  //cx是cosnt int，并且是左值，                     
-    //所以uref2的类型是const int&  
+                        //所以uref2的类型是const int&  
     auto&& uref3 = 27;  //27是int，并且是右值，                     
-        //所以uref3的类型是 int&&
+                        //所以uref3的类型是 int&&
 
-        const char name[] = "R. N. Brigs";
-    //name的类型是 const char[13]
+    const char name[] = "R. N. Brigs";
+                    //name的类型是 const char[13]
 
-    auto arr1 = name;   //arr1的类型是const char*
+    auto arr1 = name;   //pt arr1=const char*
 
-    auto& arr2 = name;  //arr2的类型是const char()[13]
+    auto& arr2 = name;  //pt arr2=const char()[13]
 
 
-    auto func1 = someFunc; //func1的类型是void(*)(int，double)
+    auto func1 = someFunc; //pt func1=void(*)(int，double)
 
-    auto& func2 = someFunc; //func2的类型是void()(int, double)
+    auto& func2 = someFunc; //pt func2=void()(int, double)
 
     /****
       int x1 = 27;
@@ -45,8 +45,10 @@ int main(void)
     auto x3={27};
     auto x4{27};
 
+    //auto x5={1,2,3.0};//error
+    auto x5 = {11, 23, 9};
+    //auto x5{11,23,9};//error
 
-    //auto x = {11, 23, 9};
     f({11,23,9});
 
     /******* c++14

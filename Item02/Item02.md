@@ -126,18 +126,16 @@ auto x4{27};
 
 ```
 auto x1 = 27;   //类型是int， 值是27
-
 auto x2(27);    //同上
+auto x4{27};    //同上
 
 auto x3 = {27}; //类型是 std::initializer_list<int>
                 //值是{27}
-
-auto x4{27};    //同上
 ```
 产生这样的结果是由于auto的特殊的类型推导规则。当用初始化列表的形式来初始化auto声明的变量时，推导出来的类型就是std::initializer_list,下面这样的代码是错误的：
 
 ```
-auto x ={1, 2, 3.0};    //错误！ 不能推导
+auto x5 ={1, 2, 3.0};    //错误！ 不能推导
                         //std::initializer_list<T>中的T
 ```
 就像注释里说的，这种情况下的类型推导将会失败，但是你需要知道这里其实产生了两种类型推导。一种就来自x5的auto类型推导。因为x5的初始化在花括号中，x5就被推导为std::initializer_list。但是 std::initializer_list是一个template。用T来实例化std::initializer_list意味着T的类型也必须被推导出来。这里发生的推导属于第二种类型推导：template类型推导。在这个例子中，这个推导失败了，因为初始化列表中的值不是同种类型的。
