@@ -97,8 +97,9 @@ unsigned sz = v.size();
 v.size()的官方返回类型是std::vector::size_type，但是很少有开发者意识到这点。std::vector::size_type常被指定为无符号整形，所以很多开发者认为unsigned够用了，并写代码时也会像上面这么写。这会造成一些有趣的结果。举个例子，在32位的Windows下，unsigned和std::vector::size_type大小是一样的。但是64位Windows下，unsigned是32位的，而std::vector::size_type是64位的。这意味着工作在32位Windows和工作在64位Windows下会表现的不一样，当把你的程序从32位移植到64下时，没有人希望遇到这样的问题。
 
 使用auto能保证你不会遇到这样的问题：
-
+```
 auto sz = v.size(); //sz的类型是std::vector<int>::size_type
+```
 难道你还不肯定使用auto的智慧？那再看看这代码：
 
 ```
