@@ -29,9 +29,9 @@ auto highPriority = features(w)[5];
 ```
 processWidget(w, highPriority); //未定义的行为！
 ```
-就像注释指示的那样，调用processWidget现在是未定义的行为。但是为什么会这样？回答有可能很奇怪。在使用auto的代码中，highPriority的类型不再是bool、尽管`std::vector<bool>`概念上保存了bools，`std::vector<bool>`的`operator[]`不返回容器元素的引用（除了bool类型，其他的std::vector::operator[]都这么返回）。作为替换，它返回一个类型是`std::vector<bool>::reference`的对象（一个类内部装了`std::vector<bool>）。
+就像注释指示的那样，调用processWidget现在是未定义的行为。但是为什么会这样？回答有可能很奇怪。在使用auto的代码中，highPriority的类型不再是bool、尽管`std::vector<bool>`概念上保存了bools，`std::vector<bool>`的`operator[]`不返回容器元素的引用（除了bool类型，其他的`std::vector::operator[]`都这么返回）。作为替换，它返回一个类型是`std::vector<bool>::reference`的对象（一个类内部装了`std::vector<bool>`）。
 
-`std::vector<bool>::reference`之所以会存在是因为`std::vector<bool>`被指定来代表它包装的bools，每个bool占一bit。这将造成一个问题，对于std::vector<bool>的operator[]，因为对于std::vector<T>，operator[]被假定要返回T&，但是C++禁止返回bits的引用。因为没有可能返回一个bool&，operator[]为`std::vector<bool>`返回一个对象，这个对象表现得像bool&一样。为了这个行为能成功，在本质上，std::vector<bool>::reference对象必须能被用在任何bool&能用的地方。在C++的众多特性中，能让`std::vector<bool>::reference`这么工作的是一个到bool的隐式转换。（不是bool&到bool，对于`std::vector<bool>::reference`如何效仿bool&，如果要解释清楚所有的技术那就走远了，所以我只是简单地谈论了众多技术中的一个，隐式转换。）
+`std::vector<bool>::reference`之所以会存在是因为`std::vector<bool>`被指定来代表它包装的bools，每个bool占一bit。这将造成一个问题，对于`std::vector<bool>`的operator[]，因为对于`std::vector<T>`，`operator[]`被假定要返回T&，但是C++禁止返回bits的引用。因为没有可能返回一个bool&，operator[]为`std::vector<bool>`返回一个对象，这个对象表现得像bool&一样。为了这个行为能成功，在本质上，`std::vector<bool>::reference`对象必须能被用在任何bool&能用的地方。在C++的众多特性中，能让`std::vector<bool>::reference`这么工作的是一个到bool的隐式转换。（不是bool&到bool，对于`std::vector<bool>::reference`如何效仿bool&，如果要解释清楚所有的技术那就走远了，所以我只是简单地谈论了众多技术中的一个，隐式转换。）
 
 记住了这些信息后，再看看源代码的这一部分：
 
@@ -39,7 +39,7 @@ processWidget(w, highPriority); //未定义的行为！
 bool highPriority = features(w)[5]; //显式声明
                                     //highPriority的类型
 ```
-这里，features返回一个`std::vector<bool>`对象，它的`operator[]`被调用。`operator[]`返回一个`std::vector<bool>::reference`对象，根据highPriority初始化的需要，这个对象将会隐式地转换为bool。因此highPriority最后代表features返回的std::vector<bool>中的bit 5的值（就像它支持的那样）。
+这里，features返回一个`std::vector<bool>`对象，它的`operator[]`被调用。`operator[]`返回一个`std::vector<bool>::reference`对象，根据highPriority初始化的需要，这个对象将会隐式地转换为bool。因此highPriority最后代表features返回的`std::vector<bool>`中的bit 5的值（就像它支持的那样）。
 
 对比对highPriority使用auto初始化声明时发生的情况：
 
@@ -56,7 +56,7 @@ auto highPriority = features(w)[5]; //推导highPriority的类型
 processWidget(w, highPriority); //未定义行为！
                                 //highPriority持有悬挂的指针
 ```
-`std::vector<bool>::reference`是一个代理类的例子：一个类的存在是为了效仿和增加其他类型的行为。代理类被用作各种各样的目的。`std::vector<bool>::reference`为了提供一个错觉：`std::vector<bool>的operator[]`返回一个bool引用。再举个例子，标准库的智能指针是一个对原始指针进行资源管理的代理类。代理类的用法已经慢慢固定下来了。事实上，设计模式“Proxy”就是软件设计模式万神殿（Pantheon）中长期存在的一员。
+`std::vector<bool>::reference`是一个代理类的例子：一个类的存在是为了效仿和增加其他类型的行为。代理类被用作各种各样的目的。`std::vector<bool>::reference`为了提供一个错觉：`std::vector<bool>`的`operator[]`返回一个bool引用。再举个例子，标准库的智能指针是一个对原始指针进行资源管理的代理类。代理类的用法已经慢慢固定下来了。事实上，设计模式“Proxy”就是软件设计模式万神殿（Pantheon）中长期存在的一员。
 
 对于客户来说，一些代理类被设计成可见的。举个例子，这就是std::shared_ptr和std::unique_ptr的情况。另外一种代理类被设计成或多或少不可见的。`std::vector<bool>::reference`就是这种“不可见”代理类的例子，对于它的同胞std::bitset也有这样的代理类：std::bitset::reference。
 
