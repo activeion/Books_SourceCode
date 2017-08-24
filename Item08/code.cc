@@ -20,14 +20,13 @@ int main(void)
 {
     f(0); //调用f(int)，永远不调用 f(void*)
     //f(NULL); //可能不能通过编译，但是通常会调用f(int), 
-                //gcc不知道调用哪个, 触发error， 但永远不会调用f(void*)
+               //gcc不知道调用哪个, 触发error， 但永远不会调用f(void*)
     f(nullptr);         //调用f(void*)版本的重载函数
 
     auto result = findRecord(/* arguments*/);
     if(result == nullptr){//不用看findRecord()原型，一眼就明白result是指针.
         //...
     }
-
 
 
     std::mutex f1m, f2m, f3m;
