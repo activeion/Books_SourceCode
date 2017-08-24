@@ -3,7 +3,7 @@
 class Widget
 {
     public:
-    operator bool() const{return true;}
+    operator bool() const{return true;} //不能写返回值类型
 };
 
 std::vector<bool> vec;
