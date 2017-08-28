@@ -1,4 +1,5 @@
 # Item 18: 使用srd::unique_ptr来管理独占所有权的资源
+http://blog.csdn.net/boydfd/article/details/50637260
 
 本文翻译自modern effective C++，由于水平有限，故无法保证翻译完全正确，欢迎指出错误。谢谢！
 博客已经迁移到这里啦
@@ -18,7 +19,7 @@ class Bond:
     public Investment { ... };
 
 class RealRstate:
-    public Investmemt { ... };
+    public Investment { ... };
 ```
 对于这样的类层次，一个工厂函数常常会在堆上分配一个对象，并且返回一个指向这个对象的指针，当这个对象不再需要被使用的时候，调用者有责任销毁这个对象。这完全符合std::unique_ptr的概念，因为调用者要对工厂返回的资源负责（也就是，它独占了所有权），然后当std::unique_ptr被销毁的时候，std::unique_ptr会自动销毁它指向的对象。对于Investment类层次，一个工厂函数能被声明成这样：
 
