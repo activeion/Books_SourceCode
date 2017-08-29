@@ -62,8 +62,8 @@ std::vector<std::shared_ptr<Widget>> vpw{ pw1, pw2 };
 一个对象的控制块是被指向这个对象的第一个std::shared_ptr创建的。至少这是应该发生的。通常，一个创建std::shared_ptr的函数是不可能知道是否有其他std::shared_ptr已经指向这个对象了，所以控制块的创建遵循这些规则：
 
 - std::make_shared(看Item 21)总是创建一个控制块，它制造一个新对象，所以可以肯定当std::make_shared被调用的时候，这个对象没有控制块。
-- 当一个std::shared_ptr构造自一个独占所有权的指针（也就是，一个std::unique_ptr或std::auto_ptr）时，创造一个控制块。独占所有权的指针不使用控制块，所以被指向的对象没有控制块。（作为构造的一部分，std::shared_ptr需要承担被指向对象的所有权，所以独占所有权的指针被设置为null）
-- 当使用一个原始指针调用std::shared_ptr的构造函数构造函数时，它创造一个控制块。如果你想使用一个已经有控制块的对象来创建一个std::shared_ptr的话，你可以传入一个std::shared_ptr或一个std::weak_ptr(看Item 20)作为构造函数的参数，但不能传入一个原始指针。使用std::shared_ptr或std::weak_ptr作为构造函数的参数不会创建一个新的控制块，因为它们能依赖传入的智能指针来指向必要的控制块。
+- 当从一个独占所有权的指针（也就是，一个std::unique_ptr或std::auto_ptr）构造一个std::shared_ptr对象时，创造一个控制块。独占所有权的指针不使用控制块，所以被指向的对象没有控制块。（作为构造的一部分，std::shared_ptr需要承担被指向对象的所有权，所以独占所有权的指针被设置为null）
+- 当使用一个原始指针调用std::shared_ptr的构造函数构造函数时，它创造一个控制块。如果你想使用一个已经有控制块的对象来创建一个std::shared_ptr的话，你可以传入一个std::shared_ptr或一个std::weak_ptr(看Item 20)作为构造函数的参数，但不能传入一个（这个已经有控制块的对象的）原始指针。使用std::shared_ptr或std::weak_ptr作为构造函数的参数不会创建一个新的控制块，因为它们能依赖传入的智能指针来指向必要的控制块。
 
 这些规则导致的一个结果就是：用一个原始指针来构造超过一个的std::shared_ptr对象会让你免费坐上通往未定义行为的粒子加速器，因为被指向的对象会拥有多个控制块。多个控制块就意味着多个引用计数，多个引用计数就意味着对象会被销毁多次（一个引用计数一次）。这意味着这样的代码是很糟糕很糟糕很糟糕的：
 
@@ -118,7 +118,7 @@ void Widget::process()
                                             //列表中去，这是错误的！
 }
 ```
-注释上说这会产生错误已经说明了一切（或者大部分事实，错误的地方是传入this，而不是emplace_back的使用。如果你不熟悉emplace_back，请看Item 42），这段代码能编译，但是它传入一个原始指针（this）给一个std::shared_ptr的容器。因此std::shared_ptr的构造函数将为它指向的Widget（`*this`）创建一个新的控制块。直到你意识到如果在成员函数外面已经有std::shared_ptr指向这个Widget前，这听起来都是无害的，这是对未定义行为的赌博，设置以及匹配。
+注释上说这会产生错误已经说明了一切（或者大部分事实，错误的地方是传入this，而不是emplace_back的使用。如果你不熟悉emplace_back，请看Item 42），这段代码能编译，但是它传入一个原始指针（this）给一个std::shared_ptr的容器。因此std::shared_ptr的构造函数将为它指向的Widget（`*this`）创建一个新的控制块。That doesn’t sound harmful until you realize that if there are std::shared_ptrs outside the member function that already point to that Widget, it’s game, set, and match for undefined behavior.直到你意识到如果在成员函数外面已经有std::shared_ptr指向这个Widget前，这听起来都是无害的，这是对未定义行为的赌博，设置以及匹配。
 
 std::shared_ptr的API包括一个为这种情况专用的工具。它有着标准C++库所有名字中有可能最奇怪的名字：std::enable_shared_from_this。如果你想要一个类被std::shared_ptr管理，你能继承自这个基类模板，这样就能用this指针安全地创建一个std::shared_ptr。在我们的例子中，Widget应该像这样继承std::enable_shared_form_this：
 ```
