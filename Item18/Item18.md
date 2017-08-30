@@ -166,6 +166,7 @@ template<typename... Ts>
 std::unique_ptr<Investment, void(*)(Investment*)>
 makeInvestment(Ts&&... args);
 ```
+
 带大量状态的仿函数deleter会产生大小很大的std::unique_ptr。如果你发现一个自定义deleter让你的std::unique_ptr大到无法接受，你可能需要改变你的设计了。
 
 工厂函数不是std::unique_ptr唯一的使用情况。它们在实现Pimpl机制的时候更加流行。这样的代码不是很复杂，但是也不是直截了当的，所以我会在Item 22中提及，那个Item是致力于这个话题的。
@@ -186,4 +187,4 @@ std::share_ptr<Investment> sp =         //从std::unique_ptr转换
 
 - std::unique_ptr是一个小的，快的，mov-only的智能指针，它能用来管理资源，并且独占资源的所有权。
 - 默认情况下，资源的销毁是用过delete进行的，但是自定义deleter能指定销毁的行为。用带状态的deleter和函数指针作为deleter会增加std::unique_ptr对象的大小。
-- 从std::unique_ptr转换到std::shared_ptr很简单。
+- 从std::unique_ptr转换到std::shared_ptr很简单。(工厂方法一般会返回一个std::unique_ptr, 而不是std::shared_ptr)

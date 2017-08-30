@@ -2,6 +2,7 @@
 
 http://blog.csdn.net/boydfd/article/details/50637267
 
+## weak_ptr的构造
 矛盾的是，我们很容易就能创造出一个和std::shared_ptr类似的智能指针，但是，它们不参加被指向资源的共享所有权管理。换句话说，这是一个行为像std::shared_ptr，但却不影响对象引用计数的指针。这样的智能指针需要与一个对std::shared_ptr来说不存在的问题做斗争：它指向的东西可能已经被销毁了。一个真正的智能指针需要通过追踪资源的悬挂（也就是说，被指向的对象不存在时）来解决这个问题。std::weak_ptr正好就是这种智能指针。
 
 你可能会奇怪std::weak_ptr有什么用。当你检查std::weak_ptr的API时，你可能会更奇怪。它看起来一点也不智能。std::weak_ptr不能解引用，不能检查指针是否为空。这是因为std::weak_ptr不是独立的智能指针。它是std::shared_ptr的附加物。
@@ -22,6 +23,8 @@ std::weak_ptr<Widget> wpw(spw);                 //wpw和spw指向相同的Widget
 spw = nullptr;                                  //引用计数变成0，并且Widget被销毁
                                                 //wpw现在是悬挂的
 ```
+
+## weak_ptr失效检查
 悬挂的std::weak_ptr被称为失效的（expired）。你能直接检查它：
 
 ```
@@ -42,6 +45,8 @@ auto spw2 = wpw.lock();                         //和上面一样，不过用的
 std::shared_ptr<Widget> spw3(wpw);          //如果wpw已经失效了，抛出一个
                                             //std::bad_weak_ptr异常
 ```
+
+## weak_ptr应用 - 对象池
 但是你可能还是对std::weak_ptr的用途感到奇怪。考虑一个工厂函数，这个函数根据唯一的ID，产生一个指向只读对象的智能指针。与Item 18的建议相符合，考虑工厂函数的返回类型，它返回一个std::unique_ptr：
 
 ```
@@ -74,6 +79,8 @@ std::shared_ptr<const Widget> fastLoadWidget(WidgetID id)
 
 fastLoadWidget的实现忽略了一个事实，那就是缓存可能积累一些失效了的std::weak_ptr（对应的Widget已经不再被使用（因此这些Widget已经销毁了））。实现能被进一步优化，但是比起花费时间在这个问题（对std::weak_ptr的理解没有额外的提升）上，让我们考虑第二个使用场景：观察者设计模式。这个设计模式最重要的组件就是目标（subject，目标的状态可能会发生改变）和观察者（observer，当目标的状态发生改变时，观察者会被通知）。大多数实现中，每个目标包含一个数据成员，这个成员持有指向观察者的指针。这使得目标在状态发生改变的时候，通知起来更容易。目标对于控制他们的观察者的生命周期没有兴趣（也就是，当他们销毁时），但是它们对它们的观察者是否已经销毁了很有兴趣，这样它们就不会尝试去访问观察者了。一个合理的设计是：让每个目标持有一个容器，这个容器中装了指向它观察者的std::weak_ptr，因此，这让目标在使用一个指针前能确定它是否悬挂的。
 
+
+## weak_ptr应用 - 循环引用
 最后一个std::weak_ptr的使用例子是：考虑一个关于A，B，C的数据结构，A和C共享B的所有权，因此都持有std::shared_ptr指向B：
 
 假设从B指向A的指针同样有用，这个指针应该是什么类型的呢？
