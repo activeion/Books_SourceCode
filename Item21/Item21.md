@@ -130,7 +130,7 @@ auto spv = std::make_shared<std::vector<int>>(initList);
 ## 不得不使用new --- 定制了自己的new和delete
 有些类定义了它们自己的operator new和operator delete。这些函数的存在暗示了全局的内存分配和回收规则对这些类型不适用。常常，特定的类通常只被设计来分配和回收和这个类的对象大小完全一样的内存块，比如，Widget类的operator new和operator delete常被设计来分配和回收sizeof(Widget)大小的内存。这样的分配规则不适合std::shared_ptr对自定义分配（通过std::allocate_shared）和回收（deallocation）（通过自定义deleter）的支持，因为std::allocate_shared要求的总内存大小不是动态分配的对象大小，而是这个对象的大小加上控制块的大小。总的来说，如果一个对象的类型有特定版本的operator new和operator delete，那么使用make函数来创建这个对象常常是一个糟糕的想法。
 
-std::make_shared比起直接使用new在大小和速度方面上的提升源自于std::shared_ptr的控制块被放在和对象一起的同一块内存中。当对象的引用计数变成0的时候，对象被销毁了（也就是它的析构函数被调用了）。但是，直到控制块被销毁前，它占据的内存都不能被释放，因为动态分配的内存块同时包含了它们两者。
+std::make_shared比起直接使用new在大小和速度方面上的提升源自于make_shared()将std::shared_ptr的控制块被放在和对象一起的同一块内存中。当对象的引用计数变成0的时候，对象被销毁了（也就是它的析构函数被调用了）。但是，直到控制块被销毁前，它占据的内存都不能被释放，因为动态分配的内存块同时包含了它们两者。
 
 就像我说的，控制块除了包含引用计数以外，还包含了一些记录信息。引用计数记录了有多少std::shared_ptr引用了控制块，但是控制块包含第二个引用计数，这个引用计数记录了有多少std::weak_ptr引用这个控制块。第二个引用计数被称为weak count。当一个std::weak_ptr检查自己是否失效（看Item 19）时，它是通过检查它引用的控制块中的引用计数（不是weak ount）来做到的。如果引用计数是0（也就是如果它指向的对象没有std::shared_ptr引用它，这个对象因此已经被销毁了），那么std::weak_ptr就失效了，不然就没失效。
 
