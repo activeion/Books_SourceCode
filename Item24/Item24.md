@@ -122,16 +122,18 @@ public:
 
 ```
 auto timeFuncInvocation =
-    [](auto&& func, auto&&... param)
+    [](auto&& func, auto&&... params)
     {
-        start timer;
-        std::forward<decltype(func)>(func){             // 用params
+        //start timer;
+        std::forward<decltype(func)>(func)(             // 用params
             std::forward<decltype(params)>(params)...   // 调用func
-        };
-        停止timer并记录逝去的时间。
+        );
+        //停止timer并记录逝去的时间。
     };
 ```
-如果你对lambda中“std::forward
+如果你对lambda中“std::forward<decltype(blah blah blah)>”代码的反应是：这是啥东西啊，这可能意味着你还没有读 Item33。不必担心。在本条款里面重要的事情是lambda表达式声明的`auto&&`参数。func是一个可以绑定到任意可调用对象(左值或者右值)的通用引用，args是可变参数包通用引用。感谢auto通用引用，结果是，timeFuncInvocation就能够对任意函数的执行进行精确计时。（更多关于“any"和"pretty much any"之间区别的信心，请参考Item30。）
+
+牢记心中，在整个条款---通用引用的基础---是一个谎言，或者说是一个抽象。谎言所掩盖的真实的情况是"引用折叠"，这是Item28的话题。但是“引用折叠”并没有使得本条款的谎言或者说抽象变得无用。区分右值引用和通用引用能够帮助你更准确地阅读代码，与你同事交流信息更加清楚， 也使得你对Item25和Item26有更好的理解，它们非常依赖于这种区分（通用引用和右值引用的区分）。因此拥抱它并陶醉在其中吧，就像牛顿运动定律那样(技术上并不正确)，非常有用并且让爱因斯坦的广义相对论（真正的事实）变得更易于应用，因此通用引用的说法仅仅是引用折叠的更好的说法。
 
 ## 你要记住的事
 - 如果一个函数模板参数有T&&的格式，并且会被推导，或者一个对象使用auto&&来声明，那么参数或对象就是一个universal引用。
