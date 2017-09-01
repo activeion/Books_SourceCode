@@ -52,8 +52,8 @@ int main(void)
                 //start timer;
                 std::cout<<"start timer"<<std::endl;
 
-                std::forward<decltype(func)>(func)(             // 用params
-                    std::forward<decltype(params)>(params)...   // 调用func
+                std::forward<decltype(func)>(func)(             // 调用func
+                    std::forward<decltype(params)>(params)...   // 填入func函数的调用参数params 
                 );
 
                 //停止timer并记录逝去的时间。

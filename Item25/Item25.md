@@ -85,7 +85,7 @@ public:
 ```
 w.setName("Adela Novak");
 ```
-使用universal引用版本的setName，在“Adela Novak”字符串被传给setName时，它会被转发给处于w对象中的一个std::string（就是w.name）的operator=（译注：const char*版本的operator=）函数。因此，w的name数据成员将是用字符串直接赋值的；没有出现一个临时的std::string对象。然而，使用重载版本的setName，为了让setName的参数能绑定上去，一个临时的std::string对象将被创建，然后这个临时的std::string对象将被移动到w的数据成员中去。因此这个setName的调用需要执行一次std::string的构造函数（为了创建临时对象），一个std::string的move operator=（为了move newName到w.name中去），以及一个std::string的析构函数（为了销毁临时对象）。对于const char* 指针来说，比起只调用std::string的operator=，上面这些函数就是多花的代价。额外的代价有可能随着实现的不同而产生变化，并且代价是否值得考虑也将随着应用和函数库的不同而产生变化。不管怎么说，事实就是，在一些情况下，使用一对重载了左值和右值的函数来替换带universal引用参数的函数模板有可能增加运行期的代价。如果我们推广这个例子，使得Widget的数据成员可以是任意类型的（不仅仅是熟知的std::string），性能的落差将更大，因为不是所有类型的move操作都和std::string一样便宜的（看Item 29）。
+使用universal引用版本的setName，在“Adela Novak”字符串被传给setName时，它会被转发给处于w对象中的一个std::string（就是w.name）的operator=（译注：`const char*`版本的operator=）函数。因此，w的name数据成员将是用字符串直接赋值的；没有出现一个临时的std::string对象。然而，使用重载版本的setName，为了让setName的参数能绑定上去，一个临时的std::string对象将被创建，然后这个临时的std::string对象将被移动到w的数据成员中去。因此这个setName的调用需要执行一次std::string的构造函数（为了创建临时对象），一个std::string的move operator=（为了move newName到w.name中去），以及一个std::string的析构函数（为了销毁临时对象）。对于`const char*` 指针来说，比起只调用std::string的operator=，上面这些函数就是多花的代价。额外的代价有可能随着实现的不同而产生变化，并且代价是否值得考虑也将随着应用和函数库的不同而产生变化。不管怎么说，事实就是，在一些情况下，使用一对重载了左值和右值的函数来替换带universal引用参数的函数模板有可能增加运行期的代价。如果我们推广这个例子，使得Widget的数据成员可以是任意类型的（不仅仅是熟知的std::string），性能的落差将更大，因为不是所有类型的move操作都和std::string一样便宜的（看Item 29）。
 
 然而，关于重载左值和右值最关键的问题不在于源代码的体积和使用习惯，也不在于执行期的效率。而在于它是一种可扩展性很差的设计。Widget::setName只携带一个参数，所以只需要两个重载，但是对于一些携带更多参数的函数，而且每个参数都可以是左值或右值，那么需要重载的数量就成几何增长了：n个参数需要2^n个重载。并且这还不是最糟糕的。一些函数—函数模板—携带不确定数量的参数，每个参数可以是左值或右值。这种函数的代表人物就是std::make_shared，以及C++14中的std::make_unique（看Item 21）。看一下它们最常见的声明式：
 
