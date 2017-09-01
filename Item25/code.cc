@@ -9,6 +9,7 @@ class Widget
 {
     public:
         Widget(){}
+        Widget(const Widget& lhs):name(lhs.name), p(lhs.p){}
         Widget(Widget&& rhs)    // rhs是一个右值引用，肯定指向一个有资格被move的对象, 即右值
             : name(std::move(rhs.name)), p(std::move(rhs.p))
         {}
@@ -69,6 +70,21 @@ std::string getWidgetName() //工厂函数
     return str;
 }
 
+Widget makeWidget()         //优先move返回值
+{
+    Widget w;
+    w.setName("without move");
+    //...                     
+    return w;               
+}
+Widget makeWidget_move()         // 错误的move版本的makeWidget()
+{
+    Widget w;
+    w.setName("with move");
+    //...                     
+    return std::move(w);               
+}
+
 int main(void)
 {
     Widget w;
@@ -97,6 +113,13 @@ int main(void)
         std::cout<<"------"<<std::endl;
         w.setSignText(std::move(str));  // str为右值, 被偷
     }
+
+
+    {
+        Widget w = makeWidget();
+        Widget ww = makeWidget_move();
+    }
+
 
     return 0;
 }

@@ -170,7 +170,7 @@ Widget makeWidget()         // 拷贝版本的makeWidget
 他们就能通过把“拷贝”转换成move来“优化”它：
 
 ```
-Widget makeWidget()         // 拷贝版本的makeWidget
+Widget makeWidget()         // move版本的makeWidget
 {
     Widget w;               
     ...                     

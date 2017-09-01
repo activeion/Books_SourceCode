@@ -4,7 +4,7 @@ http://blog.csdn.net/boydfd/article/details/50991219
 如果你需要写一个以名字作为参数，并记录下当前日期和时间的函数，在函数中还要把名字添加到全局的数据结构中去的话。你可能会想出看起来像这样的一个函数：
 
 ```
-std::multiset<std::string> name;            // 全局数据结构
+std::multiset<std::string> names;            // 全局数据结构
 
 void logAndAdd(const std::string& name)
 {
@@ -21,7 +21,6 @@ void logAndAdd(const std::string& name)
 
 ```
 std::string petName("Darla");
-
 logAndAdd(petName);                     // 传入一个std::string左值
 
 logAndAdd(std::string("Persephone"));   // 传入一个std::string右值
@@ -38,7 +37,7 @@ logAndAdd("Patty Dog");                 // 传入字符串
 
 ```
 templace<typename T>
-void logAndAdd(T& name)
+void logAndAdd(T&& name)
 {
     auto now = std::chrono::system_clock::now();
     log(now, "logAndAdd");
@@ -70,6 +69,7 @@ void logAndAdd(int idx)                 // 新的重载
     log(now, "logAndAdd");
     names.emplace(nameFromIdx(idx));
 }
+```
 对于两个重载版本的函数，调用的决议（决定调用哪个函数）结果就同我们所期待的一样：
 
 ```
