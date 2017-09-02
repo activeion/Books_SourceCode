@@ -27,25 +27,71 @@ void logAndAdd2(T&& name)
     names.emplace(std::forward<T>(name));
 }
 
+
+std::string nameFromIdx(int idx)
+{
+    (void)idx;
+    return std::string("ji zhonghua"); //优先移动
+}
+
+class Person {
+public:
+    template<typename T>
+        explicit Person(T&& n)          // 完美转发的构造函数
+        : name(std::forward<T>(n)) {}   // 初始化数据成员
+
+    explicit Person(int idx)            // int构造函数
+        : name(nameFromIdx(idx)) {}
+    //…
+    private:
+    std::string name;
+};
+
 int main(void)
 {
     {
+        //在第一个调用中，logAndAdd的参数name被绑定到petName变量上了。
+        //在logAndAdd中，name最后被传给names.emplace。因为name是一个左值，
+        //它是被拷贝到names中去的。因为被传入logAndAdd的是左值（petName），
+        //所以我们没有办法避免这个拷贝。
         std::string petName("Darla");
         logAndAdd(petName);                     // 传入一个std::string左值
 
+        //在第二个调用中，name参数被绑定到一个右值上了（由“Persephone”字符串显式
+        //创建的临时变量—std::string）。name本身是一个左值，所以它是被拷贝到names中去的，
+        //但是我们知道，从原则上来说，它的值能被move到names中。在这个调用中，
+        //我们多做了一次拷贝，但是我们本应该通过一个move来实现的。
         logAndAdd(std::string("Persephone"));   // 传入一个std::string右值
 
+        //在第三个调用中，name参数再一次被绑定到了一个右值上，但是这次是由“Patty Dog”字符串
+        //隐式创建的临时变量—std::string。就和第二种调用一样，name试被拷贝到names中去的，
+        //但是在这种情况下，被传给logAndAdd原始参数是字符串。如果把字符串直接传给emplace的话，
+        //我们就不需要创建一个std::string临时变量了。取而代之，在std::multiset内部，
+        //emplace将直接使用字符串来创建std::string对象。
+        //在第三种调用中，我们需要付出拷贝一个std::string的代价，
+        //但是我们甚至真的没理由去付出一次move的代价，更别说是一次拷贝了。
         logAndAdd("Patty Dog");                 // 传入字符串
     }
 
-    {
+    {//使用模板universal引用后
         std::string petName("Darla");           // 和之前一样
-        logAndAdd2(petName);                     // 和之前一样，拷贝左值到multiset中去
+        logAndAdd2(petName);                    // 和之前一样，绑定-拷贝左值到multiset中去
 
-        logAndAdd2(std::string("Persephone"));   // 用move操作取代拷贝操作
+        logAndAdd2(std::string("Persephone"));  // 绑定-move 用move操作取代拷贝操作
 
-        logAndAdd2("Patty Dog");                 // 在multiset内部创建std::string，取代对std::string临时变量进行拷贝
+        logAndAdd2("Patty Dog");                // 并没有临时右值string对象被构造
+                                                //logAndAdd2()内pt name=const char (&)[10]
+                                                //在multiset内部用const char(&)[10]原位创建std::string，
+                                                //取代第一个调用中对std::string临时变量进行拷贝
 
+    }
+
+    {
+        Person p(1);
+        //short idx=1;Person person2(idx);      // compile error
+        //auto cloneOfPerson(p);                //贪婪的Person(T&& n)导致的问题
+        const Person cp("Nancy");               // 对象现在是const的
+        auto cloneOfPerson(cp);                 //优先调用了Person默认的copy构造函数Person(const Person& rhs)
     }
 
 
