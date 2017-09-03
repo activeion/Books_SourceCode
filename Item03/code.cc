@@ -2,7 +2,7 @@
 #include <vector>
 
 //decltype规则非常简单, 括号内是啥类型就返回啥类型.
-//auto规则(模板类型推导规则), 有引用则带引用，没有则不带，不管等号右侧是否有引用
+//auto规则(模板类型推导规则), auto自身有引用则带引用，没有则不带，不管等号右侧是否有引用
 
 template<typename Container, typename Index>
 auto authAndAccess(Container& c, Index i) -> decltype(c[i]) //decltype规则
