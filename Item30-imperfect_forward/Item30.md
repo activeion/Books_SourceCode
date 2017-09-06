@@ -33,14 +33,18 @@ In that case, calling f with a braced initializer compiles,
 f({ 1, 2, 3 }); // fine, "{1, 2, 3}" implicitly
                          // converted to std::vector<int>
 ```
-but passing the same braced initializer to fwd doesn’t compile: fwd({ 1, 2, 3 }); // error! doesn't compile
+but passing the same braced initializer to fwd doesn’t compile: 
+```
+fwd({ 1, 2, 3 }); // error! doesn't compile
+```
 That’s because the use of a braced initializer is a perfect forwarding failure case.
 All such failure cases have the same cause. In a direct call to f (such as f({ 1, 2, 3})), compilers see the arguments passed at the call site, and they see the types of the
 parameters declared by f. They compare the arguments at the call site to the parame‐ ter declarations to see if they’re compatible, and, if necessary, they perform implicit conversions to make the call succeed. In the example above, they generate a tempo‐ rary std::vector<int> object from { 1, 2, 3 } so that f’s parameter v has a std::vector<int> object to bind to.
 When calling f indirectly through the forwarding function template fwd, compilers no longer compare the arguments passed at fwd’s call site to the parameter declara‐ tions in f. Instead, they deduce the types of the arguments being passed to fwd, and
 they compare the deduced types to f’s parameter declarations. Perfect forwarding fails when either of the following occurs:
-• Compilers are unable to deduce a type for one or more of fwd’s parameters. In this case, the code fails to compile.
-• Compilers deduce the “wrong” type for one or more of fwd’s parameters. Here, “wrong” could mean that fwd’s instantiation won’t compile with the types that were deduced, but it could also mean that the call to f using fwd’s deduced types behaves differently from a direct call to f with the arguments that were passed to fwd. One source of such divergent behavior would be if f were an overloaded function name, and, due to “incorrect” type deduction, the overload of f called inside fwd were different from the overload that would be invoked if f were called directly.
+- Compilers are unable to deduce a type for one or more of fwd’s parameters. In this case, the code fails to compile.
+- Compilers deduce the “wrong” type for one or more of fwd’s parameters. Here, “wrong” could mean that fwd’s instantiation won’t compile with the types that were deduced, but it could also mean that the call to f using fwd’s deduced types behaves differently from a direct call to f with the arguments that were passed to fwd. One source of such divergent behavior would be if f were an overloaded function name, and, due to “incorrect” type deduction, the overload of f called inside fwd were different from the overload that would be invoked if f were called directly.
+
 In the “fwd({1,2,3})” call above, the problem is that passing a braced initializer to a function template parameter that’s not declared to be a std::initial izer_list is decreed to be, as the Standard puts it, a “non-deduced context.” In plain English, that means that compilers are forbidden from deducing a type for the expression { 1, 2, 3 } in the call to fwd, because fwd’s parameter isn’t declared to be a std::initializer_list. Being prevented from deducing a type for fwd’s parame‐ ter, compilers must understandably reject the call.
 Interestingly, Item 2 explains that type deduction succeeds for auto variables initial‐ ized with a braced initializer. Such variables are deemed to be std::initial izer_list objects, and this affords a simple workaround for cases where the type the forwarding function should deduce is a std::initializer_list—declare a local variable using auto, then pass the local variable to the forwarding function:
 ```
@@ -158,9 +162,10 @@ The key to passing a bitfield into a perfect-forwarding function, then, is to ta
 ```
    // copy bitfield value; see Item 6 for info on init. form
    auto length = static_cast<std::uint16_t>(h.totalLength);
-fwd(length); // forward the copy Upshot
+fwd(length); // forward the copy 
 ```
+## Upshot
 In most cases, perfect forwarding works exactly as advertised. You rarely have to think about it. But when it doesn’t work—when reasonable-looking code fails to compile or, worse, compiles, but doesn’t behave the way you anticipate—it’s impor‐ tant to know about perfect forwarding’s imperfections. Equally important is knowing how to work around them. In most cases, this is straightforward.
 ## Things to Remember
-• Perfect forwarding fails when template type deduction fails or when it deduces the wrong type.
-• The kinds of arguments that lead to perfect forwarding failure are braced ini‐ tializers, null pointers expressed as 0 or NULL, declaration-only integral const static data members, template and overloaded function names, and bitfields.
+- Perfect forwarding fails when template type deduction fails or when it deduces the wrong type.
+- The kinds of arguments that lead to perfect forwarding failure are braced ini‐ tializers, null pointers expressed as 0 or NULL, declaration-only integral const static data members, template and overloaded function names, and bitfields.

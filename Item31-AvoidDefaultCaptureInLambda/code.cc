@@ -4,11 +4,6 @@
 using FilterContainer = std::vector<std::function<bool(int)>>; // see Item 9 for "using", Item 2 for std::function
 FilterContainer filters;
 
-int computeSomeValue1(void){return 1;}
-int computeSomeValue2(void){return 2;}
-int computeDivisor(int a, int b) { return a+b; };
-
-
 class Widget {
     public:
         //…                                  // ctors, etc.
@@ -28,11 +23,7 @@ void Widget::addFilter() const
 
 void addDivisorFilter()
 {
-    auto calc1 = computeSomeValue1();
-    auto calc2 = computeSomeValue2();
-
-    auto divisor = computeDivisor(calc1,calc2);
-
+    int divisor = 2;
     filters.emplace_back(
             //[](int value){ return value%5 ==0;        // 5 is not flexible
             //[&](int value){ return value%divisor ==0;} // danger! ref to divisor will dangle!
@@ -47,12 +38,14 @@ int main(void)
     {
         addDivisorFilter();
         bool i = filters[0](4);
+        (void)i;
     }
 
     {
         Widget w(34);
         w.addFilter();
         bool i = filters[1](4);
+        (void)i;
     }
 
     return 0;
