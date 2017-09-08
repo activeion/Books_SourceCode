@@ -4,7 +4,7 @@
 
 class Widget {
     public:
-        //繁琐的办法: overloading, pass by ref
+        //书写繁琐的办法: overloading, pass by ref. 效率最高
         void addName(const std::string& newName)    //take lvalue;
         { names.push_back(newName);}                //copy it, 切记，这里不能使用使用std::move，移动左值会带来灾难性的后果。
         void addName(std::string&& newName)         //take rvalue;
@@ -15,7 +15,7 @@ class Widget {
             void addName2(T&& newName)
             { names.push_back(std::forward<T>(newName));}
 
-        //更好的解决办法: pass by value
+        //简单但不太高效的办法: pass by value, 调用堆栈太深将导致move次数过多，效率变得低下，而且传入父对象将导致slice问题。
         void addName3(std::string newName) //不使用引用
         { names.push_back(std::move(newName)); }
 
@@ -26,8 +26,9 @@ class Widget {
 
         void addName4(std::string newName)//函数参数要copy，但实际上并不值得. 因为有可能因为newName太短或者太长而无法加入names而被抛弃,这是copy是个巨大的浪费.
         {
-            if ((newName.length() >= minLen) &&
-                    (newName.length() <= maxLen))
+            const int minLen=10;
+            const int maxLen =30;
+            if ((newName.length() >= minLen) && (newName.length() <= maxLen))
             {
                 names.push_back(std::move(newName));
             } 
@@ -35,6 +36,19 @@ class Widget {
     private:
         std::vector<std::string> names;
         std::unique_ptr<std::string> p;
+};
+
+//text of password
+class Password {
+    public:
+        explicit Password(std::string pwd) : text(std::move(pwd)) {} // pass by value; construct text by move
+        void changeTo(std::string newPwd) { text = std::move(newPwd); } // pass by value;  assign text
+        void changeTo2(const std::string& newPwd) { // the overload for lvalues
+            text = newPwd; // can reuse text's memory if text.capacity() >= newPwd.size() 高效的copy
+        } 
+        //...
+    private:
+        std::string text;
 };
 
 int main(void)
@@ -70,7 +84,14 @@ int main(void)
         w.setPtr2(std::make_unique<std::string>("Modern C++")); // rvalue, two move
     }
 
-    //...未完待续
+    //
+    {
+        std::string initPwd("Supercalifragilisticexpialidocious");
+        Password p(initPwd);
+
+        std::string newPassword = "Beware the Jabberwock";
+        p.changeTo(newPassword);
+    }
 
 
     return 0;
