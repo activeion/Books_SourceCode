@@ -28,8 +28,11 @@ int x = 0;
 
 具体有以下3中情况
 - ParamType是指针类型或者引用类型，但不是通用引用(universal references)类型
+    - 忽略引用，保留const
 - ParamType是通用引用(universal references)类型
+    - 忽略引用，保留const
 - ParamType既不是指针类型也不是引用类型
+    - 忽略引用，忽略const
 
 ## 情况1 ParamType 是指针类型或者引用类型，但不是通用引用(universal references)类型
 
