@@ -11,9 +11,15 @@ void f(std::initializer_list<T> param){;}
 int main(void)
 {
     auto x = 27;
+
+    /***情况三***/
     const auto cx =x;
+    auto y = cx;
+
+    /****情况一***/
     const auto& rx =x; 
 
+    /******情况二***/
     auto&& uref1 = x;   //x是int，并且是左值，                     
                         //所以uref1的类型是int&  
     auto&& uref2 = cx;  //cx是cosnt int，并且是左值，                     
@@ -21,6 +27,7 @@ int main(void)
     auto&& uref3 = 27;  //27是int，并且是右值，                     
                         //所以uref3的类型是 int&&
 
+    /****数组****/
     const char name[] = "R. N. Brigs";
                     //name的类型是 const char[13]
 

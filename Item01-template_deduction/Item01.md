@@ -28,13 +28,16 @@ int x = 0;
 
 具体有以下3中情况
 - ParamType是指针类型或者引用类型，但不是通用引用(universal references)类型
+    - 忽略引用，保留const
 - ParamType是通用引用(universal references)类型
+    - 忽略引用，保留const
 - ParamType既不是指针类型也不是引用类型
+    - 忽略引用，忽略const
 
 ## 情况1 ParamType 是指针类型或者引用类型，但不是通用引用(universal references)类型
 
 这是最简单的一种情况。只需记住以下两点
-- 如果传进来的参数expr 是一个引用类型，忽视引用的部分
+- 如果传进来的参数expr 是一个引用类型，忽视引用的部分（引用穿过函数边界，将变为变量本身,而const属于变量的属性通过函数边界属性不发生变化）
 - 通过模式匹配expr 的类型来决定ParamType 的类型从而决定T 的类型（Then pattern-match expr’s type against ParamType to determine T. ）
 
 例子如下
@@ -87,6 +90,7 @@ f(px);   // T的类型为const int，ParamType的类型为const int*
 
 如果expr是一个左值，那么T和ParamType会被推断为左值引用
 如果expr是一个右值，那么会用正常的推断方式(情况1)
+(和情况1相同，const属性可以代入模板函数内部)
 可以看以下代码
 ```
 template <typename T>

@@ -24,12 +24,12 @@ auto x = 27;
 这里，x的类型就是auto自身，另一方面，在这个声明中：
 
 ```
-cosnt auto cx = x;
+const auto cx = x;
 ```
 类型是const auto，然后：
 
 ```
-cosnt auto& rx = x;
+const auto& rx = x;
 ```
 的类型是const auto&.为了推导x，cx，rx的类型，编译器表现地好像这里有template的声明，并且用初始化表达式调用相应的template：
 
@@ -186,6 +186,5 @@ auto resetV = [&v](const auto& newValue)
 resetV({1, 2, 3});  //错误！不能推导{1，2，3}的类型
 ```
 ## 你要记住的事
-
-auto类型推导常常和template类型推导一样，但是auto类型推导假设初始化列表为std::initializer_list，但是template类型推导不这么做
-auto作为函数返回类型或lambdas表达式的形参类型时，默认使用template类型推导规则，而不是auto类型推导规则。
+- auto类型推导常常和template类型推导一样，但是auto类型推导假设初始化列表为std::initializer_list，但是template类型推导不这么做
+- auto作为函数返回类型或lambdas表达式的形参类型时，默认使用template类型推导规则，而不是auto类型推导规则。
