@@ -14,6 +14,6 @@ clean:
 	rm -f $(BINARIES) core
 
 
-code: CXXFLAGS += -Wall
+#code: CXXFLAGS += -Wall
 code: code.cc
 

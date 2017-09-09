@@ -21,31 +21,33 @@ class Widget
 
 int main(void)
 {
-    int x(0);   //用圆括号初始化
-    int y=0;  //用"="初始化
-    int z{0}; //用花括号初始化
+    {
+        int x(0);   //用圆括号初始化
+        int y=0;  //用"="初始化
+        int z{0}; //用花括号初始化
 
-    int zz={0};  // 用“={}”初始化
+        int zz={0};  // 用“={}”初始化
 
-    Widget w1;  //调用默认构造函数
-    Widget w2 = w1;    //不是赋值，调用拷贝构造函数
-    w1 = w2;    //是赋值，调用operator=
+        Widget w1;  //调用默认构造函数
+        Widget w2 = w1;    //不是赋值，调用拷贝构造函数
+        w1 = w2;    //是赋值，调用operator=
 
-    std::vector<int> v{1, 3, 5};   //v的初始内容是1，3，5
+        std::vector<int> v{1, 3, 5};   //v的初始内容是1，3，5
 
-    std::atomic<int> ai1{0};  //对的
-    std::atomic<int> ai2(0);    //对的
+        std::atomic<int> ai1{0};  //对的
+        std::atomic<int> ai2(0);    //对的
 
-    //std::atomic<int> ai3 = 0;   //错误
-    /******
-    code.cc:38:28: error: use of deleted function ‘std::atomic<int>::atomic(const std::atomic<int>&)’
-         std::atomic<int> ai3 = 0;   //错误
-                                     ^
-                                     In file included from code.cc:2:0:
-                                     /usr/include/c++/7.1.1/atomic:668:7: note: declared here
-                                            atomic(const atomic&) = delete;
-                                                   ^~~~~~
-    *******/
+        //std::atomic<int> ai3 = 0;   //错误
+        /******
+          code.cc:38:28: error: use of deleted function ‘std::atomic<int>::atomic(const std::atomic<int>&)’
+          std::atomic<int> ai3 = 0;   //错误
+          ^
+          In file included from code.cc:2:0:
+          /usr/include/c++/7.1.1/atomic:668:7: note: declared here
+          atomic(const atomic&) = delete;
+          ^~~~~~
+         *******/
+    }
 
     {
         double x=0.1;
@@ -65,4 +67,6 @@ int main(void)
         Widget w3(10, 5.0);         //调用第二个构造函数
         Widget w4{10, 5.0};         //也调用第二个构造函数
     }
+
+    return 0;
 }
