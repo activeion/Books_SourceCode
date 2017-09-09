@@ -50,14 +50,16 @@ int main(void)
     unsigned sz = v.size();
     auto sz2=v.size(); // sz2和sz类型并不一致。pt sz2=unsigned long
 
-    std::unordered_map<std::string, int> m;//std::string忘记加const，导致for-range在每个循环中，均制造一个临时的std::string变量，循环结束后再删除。巨大的浪费啊。
+    std::unordered_map<std::string, int> m;
     m.insert({"test", 1});
     m.insert({"test", 1});
     m.insert({"test", 1});
     m.insert({"test", 1});
     m.insert({"test", 1});
     m.insert({"test", 1});
-    for(const std::pair<std::string, int>& p:m)
+    //std::string忘记加const，导致for-range在每个循环中，
+    //均制造一个临时的std::string变量，循环结束后再删除。巨大的浪费啊。
+    for(const std::pair</*忘记const*/std::string, int>& p:m)
     {
         ;
         //...
@@ -67,7 +69,6 @@ int main(void)
         std::cout<< p.first<<std::endl;
         //...
     }
-    
 
-
+    return 0;
 }
