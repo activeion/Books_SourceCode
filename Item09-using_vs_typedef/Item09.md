@@ -58,7 +58,7 @@ MyAllocList<Widget>::type lw;   //客户代码
 template<typename T>
 class Widget{
 private:
-    typename MyAllocList<T>::type list;
+    typename MyAllocList<T>::type list;//讨厌的typename和::type
     ...
 };
 ```
