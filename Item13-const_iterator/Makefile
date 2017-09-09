@@ -13,6 +13,6 @@ $(BINARIES):
 clean:
 	rm -f $(BINARIES) core
 
-find_and_insert: CXXFLAGS += -Wall
+#find_and_insert: CXXFLAGS += -Wall
 find_and_insert: find_and_insert.cc
 
