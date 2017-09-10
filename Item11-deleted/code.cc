@@ -33,24 +33,36 @@ class Widget{
 //禁用某一特化版本
 template<>
 void Widget::processPointer2<void>(void*) = delete;
+//不能这么写！
+//void Widget::processPointer2(void*) = delete;
 
 int main(void)
 {
-    //if(isLucky('a'))           //错误，调用一个deleted函数
     {
-        //...
+        //if(isLucky('a'))           //错误，调用一个deleted函数
+        {
+            //...
+        }
+        //if(isLucky(true))          //错误
+        {
+            //...
+        }
+        //if(isLucky(3.5))           //错误
+        {
+            //...
+        }
+        if(isLucky(3))               //OK
+        {
+            //...
+        }
     }
-    //if(isLucky(true))          //错误
+
     {
-        //...
-    }
-    //if(isLucky(3.5))           //错误
-    {
-        //...
-    }
-    //if(isLucky(3))             //OK
-    {
-        //...
+        Widget w;
+        int x=1;
+
+        w.processPointer2(&x);
+        //w.processPointer2((void*)&x); //error: use of deleted function ‘void Widget::processPointer2(T*) [with T = void]’
     }
 
     return 0;
