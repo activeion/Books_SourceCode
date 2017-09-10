@@ -25,6 +25,7 @@ int main(void)
         Widget&& var1 = Widget();       // 右值引用
         auto&& var2 = var1;             // 不是右值引用
         (void)var2;
+        std::cout<<"pause for gdb" <<std::endl;
     }
 
     {
@@ -61,6 +62,7 @@ int main(void)
             };
         timeFuncInvocation(func);//对func函数进行调用并计时！
     }
+
     return 0;
 }
 
