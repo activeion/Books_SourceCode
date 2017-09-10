@@ -7,10 +7,10 @@ class Widget{
     public:
         Widget();
         //...
-        ~Widget();         // 为了消除siezof error，仅仅声明析构函数, 避免内联, 则可以防止static_assert出错
-        //~Widget(){}       //声明+定义~Widget()依然报sizeof error错.
+        ~Widget();         // 为了消除siezof error，避免内联, 声明和实现析构函数必须分离, 则可以防止static_assert出错
+        //~Widget(){}      //声明+定义~Widget()依然报sizeof error错.
 
     private:
-        struct Impl;       // 使用智能指针来替换原始指针
-        std::unique_ptr<Impl> pImpl; 
+        struct Impl;       //前置申明 
+        std::unique_ptr<Impl> pImpl;// 使用智能指针来替换原始指针
 };
