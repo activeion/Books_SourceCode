@@ -3,7 +3,7 @@
 
 
 template<typename...T>
-void fun(T...args)
+void arg_size(T...args)
 {
     std::cout<<sizeof...(args) <<std::endl;
 }
@@ -65,13 +65,16 @@ void expand3(Args...args)
 int main(void)
 {
 
-    fun(1,2,2,3);
+    arg_size(1,2,2,3);
 
     expand0(1,2,3);
+    std::cout<<std::endl;
 
     expand1(1,2,3);
+    std::cout<<std::endl;
 
     expand2([](int i){std::cout<<i<<std::endl;}, 1,2,3);
+    std::cout<<std::endl;
 
     //expand3(1,2,3);
     

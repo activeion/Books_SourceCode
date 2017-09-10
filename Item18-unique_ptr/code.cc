@@ -49,7 +49,7 @@ auto makeInvestment(Ts&&... params)         //使用auto推导返回值类型
  *  */
 
 template<typename Ts>
-auto makeInvestment(Ts&& params)         //使用auto推导返回值类型
+auto makeInvestment(Ts&& params)         //使用auto推导返回值类型, 注意函数的返回值是一个右值，unique_ptr赋值运算符要求rhs是一个右值.
 {
     //  译注：对于封装来说，由于前面的形式必须要先知道delInvmt的实例才能
     //  调用decltype(delInvmt)来确定它的类型，并且这个类型是只有编译器知
@@ -64,20 +64,19 @@ auto makeInvestment(Ts&& params)         //使用auto推导返回值类型
     };
 
     //下面都和以前一样  
-    std::unique_ptr<Investment, decltype(delInvmt)>
-        pInv(nullptr, delInvmt);
+    std::unique_ptr<Investment, decltype(delInvmt)> pInv(nullptr, delInvmt);//暂时用nullptr站空位
 
     if( params == 1)
     {
-        pInv.reset(new Stock());
+        pInv.reset(new Stock());//添上空位
     }
     else if( params == 2 )
     {
-        pInv.reset(new Bond());
+        pInv.reset(new Bond());//添上空位
     }
     else if( params == 3 )
     {
-        pInv.reset(new RealEstate());
+        pInv.reset(new RealEstate());//添上空位
     }
 
     return pInv;

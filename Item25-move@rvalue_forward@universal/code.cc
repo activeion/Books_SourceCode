@@ -58,7 +58,7 @@ class Widget
             std::cout<<"str@add()="<<str<<std::endl;//如果上一句不用forward，则本句输出不为空. str是个右值引用，而不是右值!
             std::cout<<"s@add()="<<s<<std::endl;
         }
-    private:
+    //private:
         std::string name;
         std::shared_ptr<SomeDataStructure> p;
 
@@ -70,14 +70,18 @@ std::string getWidgetName() //工厂函数
     return str;
 }
 
-Widget makeWidget()         //优先move返回值
+//makeWidget()函数返回一个右值，
+//用局部变量w构造返回值时，优先move
+Widget makeWidget()         
 {
     Widget w;
     w.setName("without move");
     //...                     
     return w;               
 }
-Widget makeWidget_move()         // 错误的move版本的makeWidget()
+
+// 错误的move版本的makeWidget()
+Widget makeWidget_move()         
 {
     Widget w;
     w.setName("with move");
@@ -112,12 +116,15 @@ int main(void)
         w.setSignText(str);             // str为左值，没有被偷
         std::cout<<"------"<<std::endl;
         w.setSignText(std::move(str));  // str为右值, 被偷
+        std::cout<<w.name<<std::endl;
     }
 
 
     {
         Widget w = makeWidget();
+        std::cout<<w.name<<std::endl;
         Widget ww = makeWidget_move();
+        std::cout<<ww.name<<std::endl;
     }
 
 

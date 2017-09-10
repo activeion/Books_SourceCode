@@ -14,7 +14,8 @@ class Widget
 
 using WidgetID = int;
 
-std::unique_ptr<const Widget> loadWidget(WidgetID id)
+//这里需要返回一个std::unique_ptr<const Widget>右值，用于unique_ptr控制权的move, 因此不返回引用
+std::unique_ptr<const Widget> loadWidget(WidgetID id) 
 {//非常昂贵的函数调用
 
     std::unique_ptr<const Widget> p(new Widget);
@@ -42,14 +43,14 @@ int main(void)
 
         /*检查wpw是否悬垂, 非原子操作*/
         if(wpw.expired()) {                             //如果wpw不指向一个对象
-            ;
+            std::cout << "wpw.expired() == true" << std::endl;
         }
 
         /*原子操作检查wpw是否悬垂, 方法一*/
         std::shared_ptr<Widget> spw1 = wpw.lock();      //如果wpw已经失效了，spw1是null
         auto spw2 = wpw.lock();                         //和上面一样，不过用的是auto
 
-        /*原子操作检查wpw是否悬垂, 方法二*/
+        /*原子操作检查wpw是否悬垂, 不常用, 方法二*/
         try {
             std::shared_ptr<Widget> spw3(wpw);          //如果wpw已经失效了，抛出一个
             //std::bad_weak_ptr异常

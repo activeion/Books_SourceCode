@@ -60,11 +60,11 @@ if(isLucky(3.5))...             //在检查它的幸运属性前，我们是否�
 ```
 bool isLucky(int number);
 
-isLucky(char) = delete;         //拒绝char
+bool isLucky(char) = delete;         //拒绝char
 
-isLucky(bool) =  delete;        //拒绝bool
+bool isLucky(bool) =  delete;        //拒绝bool
 
-isLucky(double) = delete;       //拒绝double和float
+bool isLucky(double) = delete;       //拒绝double和float
 ```
 （你可能会感到奇怪：double重载版本的注释中说double和float都被拒绝了。只要你记起：给出从float到int以及float到double的转换时，C++会更优先把float转换到double，你的疑问就消散了。因此，用float调用isLucky会调用double版本而不是int版本的重载。好了，它（编译器）会先尝试调用isLucky，事实上这个版本的重载是deleted的，所以在编译时就会阻止这个调用。）
 

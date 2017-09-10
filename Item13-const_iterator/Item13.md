@@ -41,7 +41,7 @@ typedef不是必须的，但是他们让代码中的cast更容易写一些。（
 
 说实话，我给出的代码可能也无法编译，因为即使使用static_cast（甚至是众所周知的杀手锏reinterpret_cast），使const_iterator转换成iterator也是无法移植的。（这不是C++98的限制，在C++11中，也是这样的。无论它看起来多像是可移植的，const_iterator都不能简单地转换到iterator。）这里有一些可移植的方法来产生一个iterator（指向const_iterator指向的地方），但是他们都很复杂，不通用，并且不值得在本书中讨论。除此之外，我希望我的观点能清楚地向你传达：const_iterator在C++98中是个大麻烦，它们不值得使用。最后，开发人员都尽量不使用const，只在必要的情况下使用它，而且在C++98中，const_iterator太不实用了。
 
-在C++11中，一切都变了。现在const_iterator已经变得容易获得以及容易使用了。容器（即使是non-const容器）的成员函数cbegin和cend产生一个const_iterator，并且原本在STL中，只使用iterator定位（比如，inset和erase）的成员函数现在也能使用const_iterator来定位了。把最初使用iterator的C++98版本的代码修改成使用const_iterator的C++11版本的代码真是太简单了：
+在C++11中，一切都变了。现在const_iterator已经变得容易获得以及容易使用了。容器（即使是non-const容器）的成员函数cbegin和cend产生一个const_iterator，并且原本在STL中，只使用iterator定位（比如，insert和erase）的成员函数现在也能使用const_iterator来定位了。把最初使用iterator的C++98版本的代码修改成使用const_iterator的C++11版本的代码真是太简单了：
 
 ```
 std::vector<int> values;

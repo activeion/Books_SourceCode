@@ -1,7 +1,7 @@
 #include <vector>
 #include <algorithm>
 
-template<typename C, typename V>
+template<typename C, typename V> //C++14
 void findAndInsert(C& container,
                    const V& targetVal,
                    const V& insertVal)
@@ -38,12 +38,13 @@ int main(void)
     }
 
     {//C++11增加了vector.cbegin() .cend()函数
-        auto it = 
+        auto it =  // pt it = const_iterator
             std::find(values.cbegin(), values.cend(), 1983);    
+        //iterator insert (const_iterator position, const value_type& val);
         values.insert(it, 1998);
     }
 
-    {//使用模板函数蓝解决这个问题, C++14
+    {//使用模板函数解决这个问题, C++14
         findAndInsert(values, 1983, 1998);
     }
 
