@@ -21,7 +21,7 @@ std::vector<Widget> vw1;
 auto vw2 = std::move(vw1);
 ```
 
-![](pic2.png)
+![](vec_move.png)
 
 std::array objects lack such a pointer, because the data for a std::array’s con‐ tents are stored directly in the std::array object:
 ```
@@ -33,7 +33,7 @@ std::array<Widget, 10000> aw1;
 // aw1 are moved into aw2
 auto aw2 = std::move(aw1);
 ```
-![](p205.png)
+![](arr_move.png)
 
 Note that the elements in aw1 are moved into aw2. Assuming that Widget is a type where moving is faster than copying, moving a std::array of Widget will be faster than copying the same std::array. So std::array certainly offers move support. Yet both moving and copying a std::array have linear-time computational com‐ plexity, because each element in the container must be copied or moved. This is far from the “moving a container is now as cheap as assigning a couple of pointers” claim that one sometimes hears.
 
