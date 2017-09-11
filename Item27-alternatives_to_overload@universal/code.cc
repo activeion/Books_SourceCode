@@ -74,15 +74,53 @@ void logAndAddImpl(int idx, std::true_type) // 整型参数：查找name，
 }
 
 
-class Person3 
+class Person3  // C++14
 {
     public:
         // 当n的类型不是Person3, Person3&, Person3&&, const Person3 ...的时候，使用本模板
         // 比如Person3(std::string n)
-        template< typename T, typename = typename std::enable_if<!std::is_same<Person3, typename std::decay<T>::type >::value >::type>
+        template< typename T, typename = std::enable_if_t<!std::is_base_of<Person3, std::decay_t<T> >::value > >
             explicit Person3(T&& n) : name(std::forward<T>(n))
-            {}
+        {}
         //... 
+    private:
+        std::string name;
+};
+class Person4  // 比Person3更严格一点
+{
+    public:
+        // 当n的类型不是Peron4及其基类相关的时候，使用本模板
+        // 比如Person4(std::string n)
+        template< typename T, typename = typename std::enable_if_t<!std::is_base_of<Person4, std::decay_t<T> >::value > >
+            explicit Person4(T&& n) : name(std::forward<T>(n))
+        {}
+        //... 
+    private:
+        std::string name;
+};
+
+
+// 完美的type_traits!!!!!!!!!! 本章的终极目标代码！
+class Person5 {
+    public:
+        template< typename T, typename = std::enable_if_t<
+                         !std::is_base_of<Person, std::decay_t<T>>::value
+                         &&
+                         !std::is_integral<std::remove_reference_t<T>>::value
+                         > >
+        explicit Person5(T&& n)      // std::string以及能被转换成
+        : name(std::forward<T>(n))   // std::string的构造函数
+        { 
+            //... 
+        }
+
+
+        explicit Person5(int idx)    // 整型的构造函数
+            : name(nameFromIdx(idx))
+        { 
+            //... 
+        }
+        //...                         // 拷贝和move构造函数等
     private:
         std::string name;
 };
@@ -117,6 +155,11 @@ int main(void)
         std::string str("AAAA");
         Person3 p2(str);
         auto cloneOfP(p);
+    }
+
+    {
+        Person5 p1("Perfect code");
+        Person5 p2(9);
     }
 
     return 0;
