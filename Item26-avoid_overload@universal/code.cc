@@ -34,12 +34,12 @@ void logAndAdd2(int idx) //特化版本，防止出错
 std::string nameFromIdx(int idx)
 {
     (void)idx;
-    return std::string("ji zhonghua"); //优先移动
+    return std::string("ji zhonghua"); // 优先移动
 }
 
 class Person {
 public:
-    template<typename T>
+    template<typename T>                // 构造函数也可以使用模板!
         explicit Person(T&& n)          // 完美转发的构造函数
         : name(std::forward<T>(n)) {}   // 初始化数据成员
 

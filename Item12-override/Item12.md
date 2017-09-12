@@ -202,10 +202,10 @@ public:
     using DataType = std::vector<double>;
     ...
 
-    DataType& data()&           //左值Widget返回左值
+    DataType& data() &          //*this是左值Widget, 调用左值版data(), 该函数返回左值
     { return values;}
 
-    DataType data() &&          //右值Widget返回右值
+    DataType data() &&          //*this是右值Widget, 调用右值版data(), 该函数返回右值
     { return std::move(values); }
     ...
 
