@@ -103,11 +103,14 @@ class Person4  // 比Person3更严格一点
 // 完美的type_traits!!!!!!!!!! 本章的终极目标代码！
 class Person5 {
     public:
-        template< typename T, typename = std::enable_if_t<
-                         !std::is_base_of<Person, std::decay_t<T>>::value
-                         &&
-                         !std::is_integral<std::remove_reference_t<T>>::value
-                         > >
+        template<
+            typename T, 
+            typename = std::enable_if_t<
+                !std::is_base_of<Person, std::decay_t<T>>::value
+                &&
+                !std::is_integral<std::remove_reference_t<T>>::value
+            > 
+        >
         explicit Person5(T&& n)      // std::string以及能被转换成
         : name(std::forward<T>(n))   // std::string的构造函数
         { 
