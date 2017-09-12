@@ -37,6 +37,7 @@ const std::size_t Widget::MinVals;//定义，不是声明
     template<typename T>
 T workOnVal(T param) // template for processing values
 {
+    return param;
 }
     template<typename T>
 void fwd3(T&& param)
