@@ -34,7 +34,7 @@ int main(void)
          ********/
     }
 
-    {// emplace_back并不高效
+    {// emplace_back并不比push_back更高效
         std::string queenOfDisco("Donna Summer");
         //emplace_back和push_back效率一样低！
         vs.push_back(queenOfDisco);       // copy-construct queenOfDisco at end of vs
