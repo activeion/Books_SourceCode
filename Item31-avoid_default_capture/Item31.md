@@ -74,7 +74,8 @@ if (std::all_of(begin(container), end(container),
 One way to solve our problem with divisor would be a default by-value capture mode. That is, we could add the lambda to filters as follows:
 ```
 filters.emplace_back(// now divisor can't dangle
-[=](int value) { return value % divisor == 0; }
+    [=](int value) 
+    { return value % divisor == 0; }
 );
 
 ```
@@ -82,7 +83,7 @@ This suffices for this example, but, in general, default by-value capture isn’
 “That could never happen!” you protest. “Having read Chapter 4, I worship at the house of smart pointers. Only loser C++98 programmers use raw pointers and delete.” That may be true, but it’s irrelevant because you do, in fact, use raw point‐ ers, and they can, in fact, be deleted out from under you. It’s just that in your modern C++ programming style, there’s often little sign of it in the source code.
 Suppose one of the things Widgets can do is add entries to the container of filters:
 ```
-   class Widget {
+class Widget {
    public:
      ...// ctors, etc.
      void addFilter() const;// add an entry to filters
@@ -92,11 +93,10 @@ Suppose one of the things Widgets can do is add entries to the container of filt
 ```
 Widget::addFilter could be defined like this:
 ```
-
 void Widget::addFilter() const
 {
     filters.emplace_back(
-    [=](int value) { return value % divisor == 0; }
+        [=](int value) { return value % divisor == 0; }
     ); 
 }
 ```
