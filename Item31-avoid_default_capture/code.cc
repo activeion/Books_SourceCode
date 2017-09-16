@@ -1,5 +1,6 @@
 #include <vector>
 #include <functional>
+#include <iostream>
 
 using FilterContainer = std::vector<std::function<bool(int)>>; // see Item 9 for "using", Item 2 for std::function
 FilterContainer filters;
@@ -16,9 +17,10 @@ void Widget::addFilter() const
 {
     filters.emplace_back(
             [divisor=divisor](int value) {  // not dangle!
-                    return value % divisor == 0; 
-                }
-            );
+                std::cout<<"value="<<value<<"; divisor="<< divisor << std::endl;
+                return value % divisor == 0; 
+            }
+    );
 }
 
 void addDivisorFilter()
@@ -28,9 +30,10 @@ void addDivisorFilter()
             //[](int value){ return value%5 ==0;        // 5 is not flexible
             //[&](int value){ return value%divisor ==0;} // danger! ref to divisor will dangle!
             [&divisor](int value){ 
-            return value%divisor ==0;
+                std::cout<<"value="<<value<<"; divisor="<< divisor << std::endl;
+                return value%divisor ==0;
             } // danger! ref to divisor will dangle!
-            );
+    );
 }
 
 int main(void)
@@ -38,14 +41,12 @@ int main(void)
     {
         addDivisorFilter();
         bool i = filters[0](4);
-        (void)i;
     }
 
     {
         Widget w(34);
         w.addFilter();
         bool i = filters[1](4);
-        (void)i;
     }
 
     return 0;
