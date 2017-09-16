@@ -110,7 +110,6 @@ int main(void)
 
 
     {
-
         PolyWidget pw;
         auto boundPW = std::bind(pw, _1);
         boundPW(1930);              // pass int to PolyWidget::operator()
