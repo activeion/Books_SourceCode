@@ -24,14 +24,17 @@ class Widget {
         void setPtr2(std::unique_ptr<std::string> ptr)
         { p=std::move(ptr);}
 
-        void addName4(std::string newName)//函数参数要copy，但实际上并不值得. 因为有可能因为newName太短或者太长而无法加入names而被抛弃,这是copy是个巨大的浪费.
+        void addName4(std::string newName)//同上, 函数参数要copy，但实际上并不值得.如本函数 
         {
             const int minLen=10;
             const int maxLen =30;
             if ((newName.length() >= minLen) && (newName.length() <= maxLen))
             {
                 names.push_back(std::move(newName));
+            } else {
+                //因为有可能因为newName太短或者太长而无法加入names而被抛弃,这个copy是个巨大的浪费.
             } 
+
         }
     private:
         std::vector<std::string> names;

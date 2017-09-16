@@ -4,6 +4,7 @@ If you have a container holding,  say, std::strings,  it  seems  logical  that w
 add a new element via an  insertion  function (i.e., insert, push_front, push_back,
 or,  for std::forward_list, insert_after),  the  type of  element you’ll pass  to  the
 function will be std::string. After all, that’s what the container has in it.
+
 Logical though this may be, it’s not always true. Consider this code:
 ```
 std::vector<std::string> vs;         // container of std::string
@@ -13,6 +14,7 @@ Here,  the  container holds std::strings, but what you have  in hand—what you�
 actually  trying  to push_back—is a string  literal,  i.e., a sequence of characters  inside
 quotes.  A  string  literal  is  not  a  std::string,  and  that means  that  the  argument
 you’re passing to push_back is not of the type held by the container.
+
 push_back for std::vector is overloaded for lvalues and rvalues as follows:
 ```
 template <class T,                           // from the C++11
@@ -40,6 +42,7 @@ vs.push_back(std::string("xyzzy"));  // create temp. std::string
 The code compiles and runs, and everybody goes home happy. Everybody except the
 performance  freaks,  that  is, because  the performance  freaks recognize  that  this code
 isn’t as efficient as it should be.
+
 To  create  a  new  element  in  a  container  of  std::strings,  they  understand,  a
 std::string  constructor  is  going  to have  to be  called, but  the  code  above doesn’t
 make  just one constructor call. It makes two. And  it calls the std::string destruc‐
@@ -61,12 +64,14 @@ string literal and pass it directly to the code in step 2 that constructs the st
 object  inside  the  std::vector, we  could  avoid  constructing  and  destroying  temp.
 That would be maximally efficient, and even  the performance  freaks could content‐
 edly decamp.
+
 Because you’re a C++ programmer, there’s an above-average chance you’re a perfor‐
 mance freak. If you’re not, you’re still probably sympathetic to their point of view. (If
 you’re  not  at  all  interested  in  performance,  shouldn’t  you  be  in  the  Python  room
 down  the hall?) So  I’m pleased  to  tell  you  that  there  is  a way  to do  exactly what  is
 needed  for maximal  efficiency  in  the  call  to push_back.  It’s  to not  call push_back.
 push_back is the wrong function. The function you want is emplace_back.
+
 emplace_back does exactly what we desire: it uses whatever arguments are passed to
 it  to construct a std::string directly  inside  the std::vector. No  temporaries are
 involved:
@@ -89,11 +94,13 @@ emplace_front. And  every  standard  container  that  supports  insert  (which  
 but std::forward_list and std::array)  supports emplace. The associative  con‐
 tainers offer emplace_hint to complement their insert functions that take a “hint”
 iterator, and std::forward_list has emplace_after to match its insert_after.
+
 What makes it possible for emplacement functions to outperform insertion functions
 is  their more  flexible  interface.  Insertion  functions  take objects  to be  inserted, while
 emplacement functions take constructor arguments for objects to be inserted. This dif‐
 ference permits emplacement functions to avoid the creation and destruction of tem‐
 porary objects that insertion functions can necessitate.
+
 Because an argument of the type held by the container can be passed to an emplace‐
 ment function (the argument thus causes the function to perform copy or move con‐
 struction), emplacement can be used even when an insertion function would require
@@ -111,6 +118,7 @@ vs.emplace_back(queenOfDisco);    // ditto
 Emplacement functions can thus do everything  insertion functions can. They some‐
 times do  it more efficiently, and, at  least  in  theory,  they should never do  it  less effi‐
 ciently. So why not use them all the time?
+
 Because, as the saying goes, in theory, there’s no difference between theory and prac‐
 tice, but in practice, there is. With current implementations of the Standard Library,
 there  are  situations  where,  as  expected,  emplacement  outperforms  insertion,  but,
@@ -122,10 +130,12 @@ structors, and,  for  containers where duplicate values are prohibited  (i.e., s
 std::map,  std::unordered_set,  std::unordered_map),  whether  the  value  to  be
 added is already in the container. The usual performance-tuning advice thus applies:
 to determine whether emplacement or insertion runs faster, benchmark them both.
+
 That’s not very satisfying, of course, so you’ll be pleased to learn that there’s a heuris‐
 tic that can help you identify situations where emplacement functions are most likely
 to be worthwhile. If all the following are true, emplacement will almost certainly out‐
 perform insertion:
+
 • The  value being  added  is  constructed  into  the  container, not  assigned.   The
 example that opened this Item (adding a std::string with the value "xyzzy" to
 a std::vector vs)  showed  the value being added  to  the end of vs—to a place
@@ -154,6 +164,7 @@ doesn’t support  insertion or emplacement, so  it’s not relevant here.) With
 non-node-based containers, you can rely on emplace_back  to use construction
 instead  of  assignment  to  get  a  new  value  into  place,  and  for  std::deque,  the
 same is true of emplace_front.
+
 • The argument type(s) being passed differ from the type held by the container.
 Again, emplacement’s advantage over insertion generally stems from the fact that
 its interface doesn’t require creation and destruction of a temporary object when
@@ -161,6 +172,7 @@ the argument(s) passed are of a type other than that held by the container. When
 an object of type T is to be added to a container<T>, there’s no reason to expect
 emplacement to run faster than insertion, because no temporary needs to be cre‐
 ated to satisfy the insertion interface.
+
 • The  container  is unlikely  to  reject  the new  value  as  a  duplicate. This means
 that  the  container  either permits duplicates or  that most of  the values you  add
 will be unique. The reason this matters is that in order to detect whether a value
@@ -171,6 +183,7 @@ in. However, if the value is already present, the emplacement is aborted and the
 node is destroyed, meaning that the cost of its construction and destruction was
 wasted. Such nodes are created  for emplacement  functions more often  than  for
 insertion functions.
+
 The  following  calls  from  earlier  in  this  Item  satisfy all  the  criteria above. They also
 run faster than the corresponding calls to push_back.
 ```
@@ -192,6 +205,7 @@ std::shared_ptrs whenever you can, but  it also concedes  that  there are situat
 where you can’t. One such situation is when you want to specify a custom deleter. In
 that  case,  you must  use  new  directly  to  get  the  raw  pointer  to  be managed  by  the
 std::shared_ptr.
+
 If the custom deleter is this function,
 ```
 void killWidget(Widget* pWidget);
@@ -207,6 +221,7 @@ ptrs.push_back({ new Widget, killWidget });
 Either  way,  a  temporary  std::shared_ptr  would  be  constructed  before  calling
 push_back.  push_back’s  parameter  is  a  reference  to  a  std::shared_ptr,  so  there
 has to be a std::shared_ptr for this parameter to refer to.
+
 The  creation  of  the  temporary  std::shared_ptr  is  what  emplace_back  would
 avoid, but  in  this case,  that  temporary  is worth  far more  than  it costs. Consider  the
 following potential sequence of events:
@@ -242,6 +257,7 @@ std::shared_ptr  and  std::unique_ptr  is  predicated  on  resources  (such  as 
 pointers from new) being immediately passed to constructors for resource-managing
 objects.  The  fact  that  functions  like  std::make_shared  and  std::make_unique
 automate this is one of the reasons they’re so important.
+
 In  calls  to  the  insertion  functions of  containers holding  resource-managing objects
 (e.g., std::list<std::shared_ptr<Widget>>), the functions’ parameter types gen‐
 erally ensure that nothing gets between acquisition of a resource (e.g., use of new) and
@@ -253,6 +269,7 @@ to  this problem. When working with  containers of  resource-managing objects,  
 must take care to ensure that  if you choose an emplacement function over  its  inser‐
 tion  counterpart,  you’re  not  paying  for  improved  code  efficiency with  diminished
 exception safety.
+
 Frankly, you shouldn’t be passing expressions like “new Widget” to emplace_back or
 push_back  or most  any  other  function,  anyway,  because,  as  Item  21  explains,  this
 leads  to  the  possibility  of  exception  safety  problems  of  the  kind we  just  examined.
@@ -278,10 +295,13 @@ emplacement  functions  are unlikely  to outperform  insertion  functions when y
 adding resource-managing objects to a container and you follow the proper practice
 of ensuring  that nothing can  intervene between acquiring a  resource and  turning  it
 over to a resource-managing object.
+
   A  second  noteworthy  aspect  of  emplacement  functions  is  their  interaction  with
 explicit  constructors.  In  honor  of C++11’s  support  for  regular  expressions,  sup‐
 pose you create a container of regular expression objects:
+```
 std::vector<std::regex> regexes;
+```
 Distracted by your colleagues’ quarreling over  the  ideal number of  times per day  to
 check one’s Facebook account, you accidentally write the following seemingly mean‐
 ingless code:
@@ -310,7 +330,7 @@ std::regex upperCaseWord("[A-Z]+");
 ```
 Creation  of  a  std::regex  from  a  character  string  can  exact  a  comparatively  large
 runtime  cost,  so,  to minimize  the  likelihood  that  such  an  expense will  be  incurred
-unintentionally,  the  std::regex  constructor  taking  a  const  char*  pointer  is
+unintentionally,  the  std::regex  constructor  taking  a  `const  char*`  pointer  is
 explicit. That’s why these lines don’t compile:
 ```
 std::regex r = nullptr;           // error! won't compile
@@ -318,6 +338,7 @@ regexes.push_back(nullptr);       // error! won't compile
 ```
 In  both  cases,  we’re  requesting  an  implicit  conversion  from  a  pointer  to  a
 std::regex, and the explicitness of that constructor prevents such conversions.
+
 In  the  call  to  emplace_back,  however,  we’re  not  claiming  to  pass  a  std::regex
 object. Instead, we’re passing a constructor argument for a std::regex object. That’s
 not considered an implicit conversion request. Rather, it’s viewed as if you’d written
@@ -327,10 +348,11 @@ std::regex r(nullptr);           // compiles
 ```
 If the laconic comment “compiles” suggests a lack of enthusiasm, that’s good, because
 this code, though it will compile, has undefined behavior. The std::regex construc‐
-tor taking a const char* pointer requires that the pointed-to string comprise a valid
+tor taking a `const char*` pointer requires that the pointed-to string comprise a valid
 regular expression, and the null pointer fails that requirement. If you write and com‐
 pile such code, the best you can hope for is that it crashes at runtime. If you’re not so
 lucky, you and your debugger could be in for a special bonding experience.
+
 Setting  aside  push_back,  emplace_back,  and  bonding  for  a moment,  notice  how
 these very similar initialization syntaxes yield different results:
 ```
@@ -343,6 +365,7 @@ the  syntax used  to  initialize r2  (with  the parentheses, although braces may
 instead) yields what is called direct initialization. Copy initialization is not permitted
 to use explicit constructors. Direct initialization is. That’s why the line initializing
 r1 doesn’t compile, but the line initializing r2 does.
+
 But back  to push_back and emplace_back and, more generally,  the  insertion  func‐
 tions versus the emplacement functions. Emplacement functions use direct initializa‐
 tion, which means they may use explicit constructors. Insertion functions employ
