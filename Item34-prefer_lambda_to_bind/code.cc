@@ -40,6 +40,8 @@ int main(void)
                         s,                               // in an hour for
                         seconds(30));                    // 30 seconds
             };
+        Sound s = Sound::Beep;
+        setSoundL(s);
 
         auto setSoundL2 =
             [](Sound s)
@@ -50,6 +52,7 @@ int main(void)
                         s,                             // same meaning
                         30s);                          // as above
             };
+        setSoundL2(s);
     }
     /*
        {
