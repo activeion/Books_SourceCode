@@ -53,13 +53,30 @@ int main(void)
                                     // invoking get or wait on fut
     }
 
+    /*****
+     * std::future.wait_for() 用法:  
+     *
+        template< class Rep, class Period >
+        std::future_status wait_for( const std::chrono::duration<Rep,Period>& timeout_duration ) const;
+
+        (since C++11)
+
+        Waits for the result to become available. Blocks until specified timeout_duration has elapsed or the result becomes available, whichever comes first. Returns value identifies the state of the result.
+        This function may block for longer than timeout_duration due to scheduling or resource contention delays.
+
+        The standard recommends that a steady clock is used to measure the duration. If an implementation uses a system clock instead, the wait time may also be sensitive to clock adjustments.
+        The behavior is undefined if valid()== false before the call to this function.
+     *
+     */
+
+
     {
         auto fut = std::async(f);   // run f asynchronously
                                     // (conceptually)
 
-        while(fut.wait_for(100ms) !=        // loop until f has 
+        while(fut.wait_for(100ms) !=        // loop at most 100ms until f has 
                 std::future_status::ready)  // finished running...
-        {                                   // which may never happen!
+        {                                   // which may never happen till 100ms!
             //... 可能会死在里面不出来, 
             //... 因为线程资源匮乏fut从来没有机会被运行
         }
