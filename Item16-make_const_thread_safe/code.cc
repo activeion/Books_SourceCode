@@ -3,7 +3,6 @@
 #include <atomic>
 #include <cmath>
 
-
 class Polynomial{ //保存一个多项式
     public:
         using PolyType = std::vector<double>;
@@ -82,14 +81,18 @@ class Widget {
         mutable bool cacheValid { false };
 };
 
+// Item37, p255:
+// In general, simultaneous member function calls on a single object are safe 
+// only if all are to const member functions (see Item16)
+
 int main(void)
 {
     {
-    Polynomial p;//多线程需要一个统一的mutex，而不是多个atomic
-    //线程一
-    auto rootOfP1 = p.roots();
-    //线程二
-    auto rootOfP2 = p.roots();
+        Polynomial p;//多线程需要一个统一的mutex，而不是多个atomic
+        //线程一
+        auto rootOfP1 = p.roots();
+        //线程二
+        auto rootOfP2 = p.roots();
     }
 
     {

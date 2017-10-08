@@ -77,8 +77,8 @@ lowing apply:
 that was chosen by  the runtime system or because  it was specified  in  the call  to
 std::async.
 - The  future  is  the  last  future referring  to  the  shared  state. For std::futures,
-this will always be  the case. For std::shared_futures,  if other std::shared_
-futures refer  to  the same shared state as  the  future being destroyed,  the  future
+this will always be  the case. For std::shared_futures,  if other std::shared_futures 
+refer  to  the same shared state as  the  future being destroyed,  the  future
 being  destroyed  follows  the  normal  behavior  (i.e.,  it  simply  destroys  its  data
 members).
 
