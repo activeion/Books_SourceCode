@@ -1,30 +1,154 @@
 #include <condition_variable>
 #include <iostream>
-#include <future>
 #include <thread>
+#include <atomic>
+#include <unistd.h>
+#include <future>
+
+std::condition_variable cv; // condvar for event
+std::mutex m;               // mutex for use with cv
+void detect_func1(void) 
+{
+    sleep(1);
+    //...                       // detect event
+    cv.notify_one();            // tell reacting task
+}
+void react_func1(void) 
+{
+    /******* code smell for use of mutex 
+     * detect/react tasks 各自独立，本无需mutex
+     * ****/
+    //...                       // prepare to react
+    {                           // open critical section
+        std::unique_lock<std::mutex> lk(m);     // lock mutex
+        cv.wait(lk);                            // wait for notify;
+                                                // this isn't correct!
+
+        // ...                                  // react to event (m is locked)
+        std::cout << "react_task is reacting to detect_task. " << std::endl;
+    }                           // close crit. section;
+}
+
+std::atomic<bool> flag(false);  //shared flag; see Item 40 for std::atomic
+void detect_func2(void)
+{
+    sleep(1);
+    //...       // detect event
+    flag = true;    // tell reacting task
+}
+void react_func2(void)
+{
+    //... // prepare to react
+    while(!flag);   // wait for event
+    std::cout << "react_task is reacting to detect_task. " << std::endl;
+}
+
+bool flag2(false);      // not std::atomic as before
+void detect_func3(void)
+{
+    sleep(1);
+    //...       //detect event
+    {
+        std::lock_guard<std::mutex> g(m);   // lock m via g's ctor
+        flag2 = true;                       // tell reacting task
+                                            // (part 1)
+    }                                       // unlock m via g's dtor
+    cv.notify_one();                        // tell reacting task
+                                            // (part 2)
+}
+void react_func3(void)
+{
+    //...                                   // prepare to react
+                                            // as before
+    {
+        std::unique_lock<std::mutex> lk(m); // as before
+        cv.wait(lk, []{ return flag2;});     // use lambda to avoid
+                                            // spurious wakeups
+        // ...                              // react to event
+                                            // (m is locked)
+    }
+    std::cout << "react_task is reacting to detect_task. " << std::endl;
+    //...                                   // continue reacting
+                                            // (m now unlocked)
+}
 
 
+
+std::promise<void> p;                       // promise for
+                                            // communication channel
+void detect_func4(void)
+{
+    sleep(1);
+    //...                                   // detect event
+    p.set_value();                          // tell reacting task
+}
+void react_func4(void)
+{
+    //...                                   // prepare to react
+    p.get_future().wait();                  // wait on future
+                                            // corresponding to p
+    std::cout << "react_task is reacting to detect_task. " << std::endl;
+    //...                                   // react to event
+}
+
+std::promise<void> p2;
+void react()                           // func for reacting task
+{
+    std::cout << "react_task is reacting to detect_task. " << std::endl;
+}
+void detect_func()                     // func for detecting task
+{
+    sleep(1);
+    std::thread t([]                   // create thread
+            {
+            p2.get_future().wait();     // suspend t until
+            react();                   // future is set
+            });
+    //…                                // here, t is suspended
+                                       // prior to call to react
+    p2.set_value();                     // unsuspend t (and thus
+                                       // call react)
+    //…                                // do additional work
+    t.join();                          // make t unjoinable
+}                                      // (see Item 37)
 
 int main(void)
 {
+    {// condvar design. can't avoid "spurious wakeup"
+        std::thread detect_task(detect_func1);
+        std::thread react_task(react_func1);
+        detect_task.join();
+        react_task.join();
+    }
+
+    {// flag design. bad, polling
+        std::thread detect_task(detect_func2);
+        std::thread react_task(react_func2);
+        detect_task.join();
+        react_task.join();
+    }
+
+    {// condvar & flag design. perfect! but extra flag needed.
+        std::thread detect_task(detect_func3);
+        std::thread react_task(react_func3);
+        detect_task.join();
+        react_task.join();
+    }
+
+    /* A condvar can be repeatedly notified, 
+     * and a flag can always be cleared and set again.
+     */
+
+    {// void future design. simple, but just one-shot
+        auto fut = std::async(detect_func4);
+        auto fut2 = std::async(react_func4);
+    }
+
     {
-        std::condition_variable cv; // condvar for event
-        std::mutex m;               // mutex for use with cv
-
-        //...                       // detect event
-        cv.notify_one();            // tell reacting task
-
-        /******* code smell for use of mutex 
-         * detect/react tasks 各自独立，无需mutex
-         * ****/
-        //...                       // prepare to react
-        {                           // open critical section
-            std::unique_lock<std::mutex> lk(m);    // lock mutex
-            cv.wait(lk);                            // wait for notify;
-                                                    // this isn't correct!
-
-            // ...                                  // rect to event (m is locked)
-        }                           // close crit. section;
+        auto fut = std::async(detect_func);
+        // 下面的代码也是可以的
+        //std::thread t(detect_func);
+        //t.join();
     }
 
     return 0;

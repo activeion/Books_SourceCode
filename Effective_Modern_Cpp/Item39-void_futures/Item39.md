@@ -182,10 +182,14 @@ So given
 ```
 std::promise<void> p;               // promise for
                                     // communications channel
+```
 the detecting task’s code is trivial,
+```
 …                                   // detect event
 p.set_value();                      // tell reacting task
+```
 and the reacting task’s code is equally simple:
+```
 …                                   // prepare to react
 p.get_future().wait();              // wait on future
                                     // corresponding to p
