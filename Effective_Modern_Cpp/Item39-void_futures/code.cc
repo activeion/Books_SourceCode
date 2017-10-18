@@ -4,50 +4,51 @@
 #include <atomic>
 #include <unistd.h>
 #include <future>
+#include <vector>
 
-std::condition_variable cv; // condvar for event
-std::mutex m;               // mutex for use with cv
+std::condition_variable cv;                     // condvar for event
+std::mutex m;                                   // mutex for use with cv
 void detect_func1(void) 
 {
     sleep(1);
-    //...                       // detect event
-    cv.notify_one();            // tell reacting task
+    //...                                       // detect event
+    cv.notify_one();                            // tell reacting task
 }
 void react_func1(void) 
 {
     /******* code smell for use of mutex 
      * detect/react tasks 各自独立，本无需mutex
      * ****/
-    //...                       // prepare to react
-    {                           // open critical section
+    //...                                       // prepare to react
+    {                                           // open critical section
         std::unique_lock<std::mutex> lk(m);     // lock mutex
         cv.wait(lk);                            // wait for notify;
                                                 // this isn't correct!
 
         // ...                                  // react to event (m is locked)
         std::cout << "react_task is reacting to detect_task. " << std::endl;
-    }                           // close crit. section;
+    }                                           // close crit. section;
 }
 
 std::atomic<bool> flag(false);  //shared flag; see Item 40 for std::atomic
 void detect_func2(void)
 {
     sleep(1);
-    //...       // detect event
-    flag = true;    // tell reacting task
+    //...                                       // detect event
+    flag = true;                                // tell reacting task
 }
 void react_func2(void)
 {
-    //... // prepare to react
-    while(!flag);   // wait for event
+    //...                                       // prepare to react
+    while(!flag);                               // wait for event
     std::cout << "react_task is reacting to detect_task. " << std::endl;
 }
 
-bool flag2(false);      // not std::atomic as before
+bool flag2(false);                          // not std::atomic as before
 void detect_func3(void)
 {
     sleep(1);
-    //...       //detect event
+    //...                                   //detect event
     {
         std::lock_guard<std::mutex> g(m);   // lock m via g's ctor
         flag2 = true;                       // tell reacting task
@@ -91,26 +92,49 @@ void react_func4(void)
     //...                                   // react to event
 }
 
-std::promise<void> p2;
-void react()                           // func for reacting task
+std::promise<void> p2;                  // "p" can't be used again, just one-shot
+void react()                            // func for reacting task
 {
     std::cout << "react_task is reacting to detect_task. " << std::endl;
 }
-void detect_func()                     // func for detecting task
+void detect_func5()                     // func for detecting task
 {
-    sleep(1);
-    std::thread t([]                   // create thread
+    std::thread t([]                    // create thread
             {
             p2.get_future().wait();     // suspend t until
-            react();                   // future is set
+            react();                    // future is set
             });
-    //…                                // here, t is suspended
-                                       // prior to call to react
+    sleep(1);
+    //…                                 // here, t is suspended
+                                        // prior to call to react
     p2.set_value();                     // unsuspend t (and thus
-                                       // call react)
-    //…                                // do additional work
-    t.join();                          // make t unjoinable
-}                                      // (see Item 37)
+                                        // call react)
+    //…                                 // do additional work
+    t.join();                           // make t unjoinable
+}                                       // (see Item 37)
+
+static const int threadsToRun = 4;
+std::promise<void> p3;                  // as before
+void detect_func6()                     // now for multiple
+{                                       // reacting tasks
+    auto sf = p3.get_future().share();  // sf's type is
+                                        //std::shared_future<void>
+        std::vector<std::thread> vt;    // container for
+                                        // reacting threads
+    for (int i = 0; i < threadsToRun; ++i) {
+        vt.emplace_back([sf]{ sf.wait();// wait on local
+                react(); });            // copy of sf; see
+    }                                   // Item 42 for info
+                                        // on emplace_back
+    sleep(1);                           
+    //…                                 // detect hangs if
+                                        // this "…" code throws!
+    p3.set_value();                     // unsuspend all threads
+    //…
+    for (auto& t : vt) {                // make all threads
+        t.join();                       // unjoinable; see Item 2
+    }                                   // for info on "auto&"
+}
 
 int main(void)
 {
@@ -145,10 +169,14 @@ int main(void)
     }
 
     {
-        auto fut = std::async(detect_func);
+        auto fut = std::async(detect_func5);
         // 下面的代码也是可以的
         //std::thread t(detect_func);
         //t.join();
+    }
+
+    {
+        auto fut = std::async(detect_func6);
     }
 
     return 0;
