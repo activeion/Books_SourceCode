@@ -10,20 +10,25 @@ ROW_FMT = '{0:2d} @ {1:2d}    {2}{0:3d}'
 
 def HalfSearch(ar, target):
     lo=0
-    hi=len(ar) 
+    hi=len(ar)-1 
     mid=0
     while(lo<hi):
         mid = (hi+lo)//2
         #print("processing..., lo=%d,mid=%d,hi=%d,ar[mid]=%d\n" %(lo, mid, hi,ar[mid]))
         if(target<ar[mid]): #升序,左半边
-            hi=mid#出界点
+            hi=mid-1#出界点
         elif (target>ar[mid]): #升序,右半边
             lo=mid+1#入界点
         else:# target == ar[mid]
             #print("just found. lo=%d,mid=%d,hi=%d,ar[mid]=%d\n" %(lo, mid, hi,ar[mid]))
-            return mid
+            return mid+1
     #print("nothing found. lo=%d,mid=%d,hi=%d,ar[mid]=%d\n" %(lo, mid, hi,ar[mid]))
-    return mid
+    if(target>=ar[-1]):
+        return len(ar)
+    elif(target<=ar[0]):
+        return 0
+    else:
+        return mid+1
 
 def demo(bisect_fn):
     for needle in reversed(NEEDLES):
