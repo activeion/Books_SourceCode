@@ -118,8 +118,13 @@ std::promise<void> p3;                  // as before
 void detect_func6()                     // now for multiple
 {                                       // reacting tasks
     auto sf = p3.get_future().share();  // sf's type is
+<<<<<<< HEAD
                                         // std::shared_future<void>
     std::vector<std::thread> vt;        // container for
+=======
+                                        //std::shared_future<void>
+        std::vector<std::thread> vt;    // container for
+>>>>>>> 6f0c0d6ec60b948a218b273f1df2b19d8d53ccda
                                         // reacting threads
     for (int i = 0; i < threadsToRun; ++i) {
         vt.emplace_back([sf]{ sf.wait();// wait on local
@@ -170,16 +175,25 @@ int main(void)
 
     {
         auto fut = std::async(detect_func5);
+<<<<<<< HEAD
         // alternative code:
         //std::thread t(detect_func5);
+=======
+        // 下面的代码也是可以的
+        //std::thread t(detect_func);
+>>>>>>> 6f0c0d6ec60b948a218b273f1df2b19d8d53ccda
         //t.join();
     }
 
     {
+<<<<<<< HEAD
         //auto fut = std::async(detect_func6);
         // alternative code:
         std::thread t(detect_func6);
         t.join();
+=======
+        auto fut = std::async(detect_func6);
+>>>>>>> 6f0c0d6ec60b948a218b273f1df2b19d8d53ccda
     }
 
     return 0;
