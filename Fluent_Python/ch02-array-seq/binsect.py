@@ -30,24 +30,24 @@ def halfsearch_left(ar, target):
     while(lo<hi):
         mid = (hi+lo)//2
         #print("processing..., lo=%d,mid=%d,hi=%d,ar[mid]=%d\n" %(lo, mid, hi,ar[mid]))
-        if (target>ar[mid]):#升序,右半边
+        if(target>ar[mid]): #升序,右半边
             lo=mid+1        #调整入界点
         else:               #升序,左半边
             hi=mid
             #print("just found. lo=%d,mid=%d,hi=%d,ar[mid]=%d\n" %(lo, mid, hi,ar[mid]))
     return lo
 
-def halfsearch_d(ar, target):
+def halfsearch_d(ar, target): #following halfsearch() & bisect_right
     lo=0
     hi=len(ar) 
     mid=0
     while(lo<hi):
         mid = (hi+lo)//2
         #print("processing..., lo=%d,mid=%d,hi=%d,ar[mid]=%d\n" %(lo, mid, hi,ar[mid]))
-        if(target>ar[mid]): #升序,左半边
-            hi=mid#出界点
-        else: #升序,右半边
-            lo=mid+1#入界点
+        if(target>ar[mid]): #降序,左半边
+            hi=mid          #出界点
+        else:               #降序,右半边
+            lo=mid+1        #入界点
     return lo
 
 def demo(bisect_fn):
@@ -81,8 +81,4 @@ if __name__ == '__main__':
 
     print(scores)
     print([grade(bisect_fn,score,breakpoints) for score in scores]) 
-
-
-
-
 
