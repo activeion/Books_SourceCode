@@ -1,31 +1,6 @@
-# strategy.py
+# strategy_func.py
 # Strategy pattern -- function-based implementation
 
-"""
-# BEGIN STRATEGY_TESTS
-
-    >>> joe = Customer('John Doe', 0)  # <1>
-    >>> ann = Customer('Ann Smith', 1100)
-    >>> cart = [LineItem('banana', 4, .5),
-    ...         LineItem('apple', 10, 1.5),
-    ...         LineItem('watermellon', 5, 5.0)]
-    >>> Order(joe, cart, fidelity_promo)  # <2>
-    <Order total: 42.00 due: 42.00>
-    >>> Order(ann, cart, fidelity_promo)
-    <Order total: 42.00 due: 39.90>
-    >>> banana_cart = [LineItem('banana', 30, .5),
-    ...                LineItem('apple', 10, 1.5)]
-    >>> Order(joe, banana_cart, bulk_item_promo)  # <3>
-    <Order total: 30.00 due: 28.50>
-    >>> long_order = [LineItem(str(item_code), 1, 1.0)
-    ...               for item_code in range(10)]
-    >>> Order(joe, long_order, large_order_promo)
-    <Order total: 10.00 due: 9.30>
-    >>> Order(joe, cart, large_order_promo)
-    <Order total: 42.00 due: 42.00>
-
-# END STRATEGY_TESTS
-"""
 # BEGIN STRATEGY
 
 from collections import namedtuple
@@ -91,3 +66,22 @@ def large_order_promo(order):
     return 0
 
 # END STRATEGY
+
+# BEGIN STRATEGY_TESTS
+
+joe = Customer('John Doe', 0)  # <1>
+ann = Customer('Ann Smith', 1100)
+cart = [LineItem('banana', 4, .5),
+        LineItem('apple', 10, 1.5),
+        LineItem('watermellon', 5, 5.0)]
+print(Order(joe, cart, fidelity_promo)) # <2> <Order total: 42.00 due: 42.00>
+print(Order(ann, cart, fidelity_promo))# <Order total: 42.00 due: 39.90>
+banana_cart = [LineItem('banana', 30, .5),
+               LineItem('apple', 10, 1.5)]
+print(Order(joe, banana_cart, bulk_item_promo)) # <3> <Order total: 30.00 due: 28.50>
+long_order = [LineItem(str(item_code), 1, 1.0)
+              for item_code in range(10)]
+print(Order(joe, long_order, large_order_promo))# <Order total: 10.00 due: 9.30>
+print(Order(joe, cart, large_order_promo))# <Order total: 42.00 due: 42.00>
+
+# END STRATEGY_TESTS

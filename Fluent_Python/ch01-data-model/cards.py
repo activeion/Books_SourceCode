@@ -1,5 +1,5 @@
 import collections
-Card = collections.namedtuple('Card', ['rank', 'suit'])
+Card = collections.namedtuple('Card_card_card', ['rank', 'suit']) #注意名字可以任意写，print(Card)语句会打印'Card_card_car'
 
 class FrenchDeck:
     ranks = [str(n) for n in range(2,11)] + list('JQKA')
