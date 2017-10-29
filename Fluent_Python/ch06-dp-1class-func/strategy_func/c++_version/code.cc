@@ -39,15 +39,10 @@ class Order
             return func_(this);
         }
 
-        double due_function()
-        {
-            return function_();
     private:
         Customer customer_;
         Cart cart_;
         Fun func_;
-
-        std::function function_;
 };
 
 
@@ -66,11 +61,6 @@ double large_order_promo(Order* order)
     return 2.6;
 }
 
-double fidelity_function(Order* order, int extra)
-{
-    return 11.4;
-}
-
 int main(void)
 {
     Customer customer("jizh", 100);
@@ -81,10 +71,10 @@ int main(void)
     //利用函数指针实现策略模式
     Order order(customer, cart, fidelity_promo);
     order.due();
-    Order order(customer, cart, bulk_promo);
-    order.due();
-    Order order(customer, cart, large_order);
-    order.due();
+    Order order2(customer, cart, bulk_promo);
+    order2.due();
+    Order order3(customer, cart, large_order_promo);
+    order3.due();
 
     //利用function实现策略模式
 

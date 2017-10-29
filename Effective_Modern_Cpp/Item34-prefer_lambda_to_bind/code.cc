@@ -1,9 +1,6 @@
 #include <chrono>
 #include <functional>
 
-/*
- * 除了多态之外，不要使用bind，用lambda代替它
- * **/
 
 // typedef for a point in time (see Item 9 for syntax)
 using Time = std::chrono::steady_clock::time_point;
@@ -17,6 +14,7 @@ enum class Volume { Normal, Loud, LoudPlusPlus };
 void setAlarm(Time t, Sound s, Duration d, Volume v){}
 
 using std::placeholders::_1;
+using std::placeholders::_2;
 
 class PolyWidget {
     public:
@@ -25,8 +23,42 @@ class PolyWidget {
         //…
 };
 
+
+
+int Func(int x, int y){return 0;}
+class A
+{
+    public:
+        int Func(int x, int y){return 1;}
+};
+
 int main(void)
 {
+    {
+        /* std::bind basic knowledge beyond <<Effective Modern C++>>, 
+            注意bf1, bf2, bf3的类型, std::bind可以缩短原函数的类型，保存部分实参
+            std::function是包含状态数据的函数对象；
+            std::bind的实质是，将部分参数和对象作为自己的状态数据先保存起来,延迟使用。
+            比如将多个各不相同的函数bind为统一的std::function，用于多态或者策略模式
+            在这方面的作用是lambda无法代替的. 
+
+            除了此之外，不要使用bind，用lambda代替它
+        */
+
+        //auto bf1 = std::bind(Func, 10, std::placeholders::_1);
+        std::function<int(int)> bf1 = std::bind(Func, 10, std::placeholders::_1);
+        //std::function<int(int, int)> bf1 = std::bind(Func, 10, std::placeholders::_1); // error, not match!
+        bf1(20);                                        //same as Func(10, 20)
+
+        A a;
+        //auto bf2 = std::bind(&A::Func, a, _1, _2);
+        std::function<int(int,int)> bf2 = std::bind(&A::Func, a, _1, _2);
+        bf2(10, 20);                                    // same as a.Func(10, 20)
+
+        std::function<int(int)> bf3 = 
+            std::bind(&A::Func, a, _1, 100);
+        bf3(10); ///< same as a.Func(10, 100)
+    }
     {
         // setSoundL ("L" for "lambda") is a function object allowing a
         // sound to be specified for a 30-sec alarm to go off an hour
@@ -54,27 +86,29 @@ int main(void)
             };
         setSoundL2(s);
     }
-    /*
-       {
-       using namespace std::chrono;           // as above
+   /*
+   {
+       using namespace std::chrono;                 // as above
        using namespace std::literals;
-       using namespace std::placeholders;     // needed for use of "_1"
-       auto setSoundB =                       // "B" for "bind"
+       using namespace std::placeholders;           // needed for use of "_1"
+       auto setSoundB =                             // "B" for "bind"
        std::bind(setAlarm,
-       steady_clock::now() + 1h,  // incorrect! see below
-       _1,
-       30s);
-       }
+           steady_clock::now() + 1h,                // incorrect! see below
+           _1,
+           30s);
+   }
 
-       {
-       using namespace std::chrono;                   // as above
+   {
+       using namespace std::chrono;                 // as above
        using namespace std::placeholders;
        auto setSoundB2 =
        std::bind(setAlarm,
-       std::bind(std::plus<steady_clock::time_point>(), steady_clock::now(), hours(1)),
-       _1,
-       seconds(30));
-       }*/
+       std::bind(std::plus<steady_clock::time_point>(), 
+            steady_clock::now(), hours(1)),
+            _1,
+            seconds(30));
+   }
+   */
 
     {
         using namespace std::chrono;
@@ -82,14 +116,14 @@ int main(void)
             [](Sound s)
             {
                 using namespace std::chrono;
-                setAlarm(steady_clock::now() + 1h,        // fine, calls
-                        s,                                // 3-arg version
-                        30s);                             // of setAlarm
+                setAlarm(steady_clock::now() + 1h,     // fine, calls
+                        s,                             // 3-arg version
+                        30s);                          // of setAlarm
             };
 
         using SetAlarm3ParamType = void(*)(Time t, Sound s, Duration d);
-        auto setSoundB =                                        // now
-            std::bind(static_cast<SetAlarm3ParamType>(setAlarm),  // okay
+        auto setSoundB =                               // now okay
+            std::bind(static_cast<SetAlarm3ParamType>(setAlarm),  
                     std::bind(std::plus<>(), steady_clock::now(), 1h),
                     _1,
                     30s);
@@ -101,12 +135,12 @@ int main(void)
 
         auto betweenL =
             [lowVal, highVal]
-            (const auto& val)                          // C++14
+            (const auto& val)                         // C++14
             { return lowVal <= val && val <= highVal; };
 
         using namespace std::placeholders;           // as above
         auto betweenB =
-            std::bind(std::logical_and<>(),            // C++14
+            std::bind(std::logical_and<>(),          // C++14
                     std::bind(std::less_equal<>(), lowVal, _1),
                     std::bind(std::less_equal<>(), _1, highVal));
     }
