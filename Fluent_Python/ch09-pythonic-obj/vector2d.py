@@ -7,12 +7,15 @@ import math
 
 # BEGIN VECTOR2D_V0 基本框架
 class Vector2d:
+    # __slots__('__x', '__y') # 申明仅有的成员变量，减少内存占用
+    # __slots__('__x', '__y', '__weakref__') # 支持弱引用
     typecode = 'd'  # <1> 类变量
 
     def __init__(self, x, y):
         self.__x = float(x)    # <2> 今早发现x,y的非法性, 比如非数字
         self.__y = float(y)
 
+    # BEGIN VECTOR2D_V3 hash
     @property
     def x(self):
         return self.__x
@@ -23,6 +26,7 @@ class Vector2d:
 
     def __hash__(self):
         return hash(self.x) ^ hash(self.y)
+    # END VECTOR2D_V3 
 
     def __iter__(self):
         return (i for i in (self.__x, self.__y))  # <3> 用于拆包, for ... in 返回一个迭代器
@@ -131,3 +135,13 @@ if __name__ == '__main__':
     print(hash(v1), hash(v2)) # (7, 384307168202284039)
     print(len(set([v1, v2]))) # 2
    # END VECTOR2D_V3_DEMO
+
+    v1 = Vector2d(1.1, 2.2)
+    dumpd = bytes(v1)
+    print(dumpd)
+    print(len(dumpd))
+    v1.typecode = 'f'
+    dumpf = bytes(v1)
+    print(dumpf)
+    print(len(dumpf))
+    print(Vector2d.typecode)
