@@ -36,7 +36,7 @@ class Vector2d:
         return '{}({!r}, {!r})'.format(class_name, *self)  # <4>
 
     def __str__(self):
-        return str(tuple(self))  # <5>
+        return str(tuple(self))  # <5> Vector2d是一个可迭代对象, 因此tuple()可以构造一个元组。
 
     def __bytes__(self):
         a = bytes([ord(self.typecode)])  # <6>
