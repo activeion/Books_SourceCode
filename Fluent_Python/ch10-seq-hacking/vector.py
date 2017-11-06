@@ -8,7 +8,7 @@ import math
 import numbers
 import functools
 import operator # 代替lambda的简短函数, add, sum, etc
-import itertools
+import itertools # chain() VECTOR_V5
 
 # BEGIN VECTOR_V1
 class Vector:
