@@ -1,12 +1,6 @@
 """
 Fibonacci generator implemented "by hand" without generator objects
-
-    >>> from itertools import islice
-    >>> list(islice(Fibonacci(), 15))
-    [0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377]
-
 """
-
 
 # BEGIN FIBO_BY_HAND
 class Fibonacci:
@@ -43,6 +37,23 @@ def fibonacci():
 
 if __name__ == '__main__':
 
+    # 验证Fibonacci()生成器, 没有使用yield
+    from itertools import islice
+    print(list(islice(Fibonacci(), 15))) # [0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377]
+
+    import types
+    F = Fibonacci()
+    F_gen = FibonacciGenerator()
+    f_gen = fibonacci()
+    print(isinstance(F, types.GeneratorType)) # False
+    print(isinstance(F_gen, types.GeneratorType)) # False
+    print(isinstance(f_gen, types.GeneratorType)) # True
+    from collections import abc
+    print(isinstance(F, abc.Iterator)) # False
+    print(isinstance(F_gen, abc.Iterator)) # True
+    print(isinstance(f_gen, abc.Iterator)) # True
+
+    # 对比Fibonacci()生成器和fibonacci()生成器, 完全相同
     for x, y in zip(Fibonacci(), fibonacci()):
         assert x == y, '%s != %s' % (x, y)
         print(x)

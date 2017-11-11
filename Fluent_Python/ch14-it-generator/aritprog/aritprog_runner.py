@@ -19,6 +19,7 @@ def main(argv):
                 continue
         test(gen_factory, verbose)
 
+
 '''
 ===========================================
 Tests for arithmetic progression generators

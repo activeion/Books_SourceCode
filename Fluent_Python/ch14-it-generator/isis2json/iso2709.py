@@ -34,7 +34,8 @@ SUBFIELD_DELIMITER = '^'
 class IsoFile(object):
 
     def __init__(self, filename, encoding = DEFAULT_ENCODING):
-        self.file = open(filename, 'rb')
+        #self.file = open(filename, 'rb') # 以二进制方式打开文件, python3出文件
+        self.file = open(filename, 'r') #以文本方式打开文件
         self.encoding = encoding
 
     def __iter__(self):
@@ -57,6 +58,19 @@ class IsoFile(object):
             if len(chunk) == 0:
                 break
             chunk = chunk.replace(CR+LF,'')
+            '''
+            TypeError: a bytes-like object is required, not 'str'
+            出现该错误往往是通过open()函数打开文本文件时，使用了‘rb’属性，
+            如：fileHandle=open(filename,'rb'),则此时是通过二进制方式打开
+            文件的，所以在后面处理时如果使用了str()函数，就会出现该错误。
+            该错误不会再python2中出现。
+
+            具体解决方法有以下两种：
+            第一种，在open()函数中使用‘r’属性，即文本方式读取，而不是‘rb’,
+            以二进制文件方式读取，可以直接解决问题。
+            第二种,在open()函数中使用‘rb’,可以在使用之前进行转换，有以下实例，
+            来自：http://stackoverflow.com/questions/33054527/python-3-5-typeerror-a-bytes-like-object-is-required-not-str
+            '''
             if CR in chunk:
                 chunk = chunk.replace(CR,'')
             if LF in chunk:
