@@ -48,10 +48,14 @@ if __name__ == '__main__':
     print(isinstance(F, types.GeneratorType)) # False
     print(isinstance(F_gen, types.GeneratorType)) # False
     print(isinstance(f_gen, types.GeneratorType)) # True
+    print(isinstance(fibonacci(), types.GeneratorType)) # 和f_gen相同, True
+    print(isinstance(fibonacci, types.GeneratorType)) # 和普通函数完全相同, False
     from collections import abc
     print(isinstance(F, abc.Iterator)) # False
     print(isinstance(F_gen, abc.Iterator)) # True
     print(isinstance(f_gen, abc.Iterator)) # True
+    print(isinstance(fibonacci(), abc.Iterator)) # 和f_gen相同, True
+    print(isinstance(fibonacci, abc.Iterator)) # 和普通函数完全相同, False
 
     # 对比Fibonacci()生成器和fibonacci()生成器, 完全相同
     for x, y in zip(Fibonacci(), fibonacci()):
