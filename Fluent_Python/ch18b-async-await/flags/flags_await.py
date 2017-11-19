@@ -14,7 +14,7 @@ import asyncio
 
 import aiohttp  # <1>
 
-from flags import BASE_URL, save_flag, show, main  # <2>
+from imported.flags import BASE_URL, save_flag, show, main  # <2>
 
 
 async def get_flag(cc):  # <3>

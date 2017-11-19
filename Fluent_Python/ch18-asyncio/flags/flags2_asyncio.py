@@ -24,7 +24,7 @@ import aiohttp
 from aiohttp import web
 import tqdm
 
-from flags2_common import main, HTTPStatus, Result, save_flag
+from imported.flags2_common import main, HTTPStatus, Result, save_flag
 
 # default set low to avoid errors from remote site, such as
 # 503 - Service Temporarily Unavailable
