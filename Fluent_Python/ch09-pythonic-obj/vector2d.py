@@ -126,6 +126,11 @@ if __name__ == '__main__':
 
     # BEGIN VECTOR2D_V3_DEMO
     #Tests of `x` and `y` read-only properties:
+    # 下面三种测试均表明x都不是函数!
+    print(callable(v1.x)) # False 
+    print(hasattr(v1.x, '__call__')) # False
+    import types
+    print(isinstance(v1.x, types.FunctionType)) # False
     print(v1.x, v1.y) # (3.0, 4.0)
     #v1.x = 123 # Traceback (most recent call last): ...  AttributeError: can't set attribute
 

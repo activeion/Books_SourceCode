@@ -1,52 +1,6 @@
 
 """
 Taxi simulator
-==============
-
-Driving a taxi from the console::
-
-    >>> from taxi_sim import taxi_process
-    >>> taxi = taxi_process(ident=13, trips=2, start_time=0)
-    >>> next(taxi)
-    Event(time=0, proc=13, action='leave garage')
-    >>> taxi.send(_.time + 7)
-    Event(time=7, proc=13, action='pick up passenger')
-    >>> taxi.send(_.time + 23)
-    Event(time=30, proc=13, action='drop off passenger')
-    >>> taxi.send(_.time + 5)
-    Event(time=35, proc=13, action='pick up passenger')
-    >>> taxi.send(_.time + 48)
-    Event(time=83, proc=13, action='drop off passenger')
-    >>> taxi.send(_.time + 1)
-    Event(time=84, proc=13, action='going home')
-    >>> taxi.send(_.time + 10)
-    Traceback (most recent call last):
-      File "<stdin>", line 1, in <module>
-    StopIteration
-
-Sample run with two cars, random seed 10. This is a valid doctest::
-
-    >>> main(num_taxis=2, seed=10)
-    taxi: 0  Event(time=0, proc=0, action='leave garage')
-    taxi: 0  Event(time=5, proc=0, action='pick up passenger')
-    taxi: 1     Event(time=5, proc=1, action='leave garage')
-    taxi: 1     Event(time=10, proc=1, action='pick up passenger')
-    taxi: 1     Event(time=15, proc=1, action='drop off passenger')
-    taxi: 0  Event(time=17, proc=0, action='drop off passenger')
-    taxi: 1     Event(time=24, proc=1, action='pick up passenger')
-    taxi: 0  Event(time=26, proc=0, action='pick up passenger')
-    taxi: 0  Event(time=30, proc=0, action='drop off passenger')
-    taxi: 0  Event(time=34, proc=0, action='going home')
-    taxi: 1     Event(time=46, proc=1, action='drop off passenger')
-    taxi: 1     Event(time=48, proc=1, action='pick up passenger')
-    taxi: 1     Event(time=110, proc=1, action='drop off passenger')
-    taxi: 1     Event(time=139, proc=1, action='pick up passenger')
-    taxi: 1     Event(time=140, proc=1, action='drop off passenger')
-    taxi: 1     Event(time=150, proc=1, action='going home')
-    *** end of events ***
-
-See longer sample run at the end of this module.
-
 """
 
 import random
@@ -65,14 +19,16 @@ Event = collections.namedtuple('Event', 'time proc action')
 
 
 # BEGIN TAXI_PROCESS
+# 描述每一辆taxi的运营行为的协程函数: 事件发生器
+# 每一个yield代表该taxi的运营状态下的产出一个事件，必须暂停更新，等待进一步的event驱动
 def taxi_process(ident, trips, start_time=0):  # <1>
     """Yield to simulator issuing event at each state change"""
-    time = yield Event(start_time, ident, 'leave garage')  # <2>
+    time = yield Event(start_time, ident, 'leave garage')  # <2> “启动”事件。得到允许运营指令事件，taxi方才开始驶出家门，开始扫街, 
     for i in range(trips):  # <3>
-        time = yield Event(time, ident, 'pick up passenger')  # <4>
-        time = yield Event(time, ident, 'drop off passenger')  # <5>
+        time = yield Event(time, ident, 'pick up passenger')  # <4> “上车”事件。一直到遇到乘客招手停车事件
+        time = yield Event(time, ident, 'drop off passenger')  # <5> “下车”事件。一直行驶到乘客目的地，目的地到达事件发生后, 乘客方才下车
 
-    yield Event(time, ident, 'going home')  # <6>
+    yield Event(time, ident, 'going home')  # <6> “收工”事件。
     # end of taxi process # <7>
 # END TAXI_PROCESS
 
@@ -99,10 +55,10 @@ class Simulator:
                 break
 
             current_event = self.events.get()  # <8>
-            sim_time, proc_id, previous_action = current_event  # <9>
+            sim_time, proc_id, previous_action = current_event  # <9> 从event中取出event时间作为仿真时间，大大加快了仿真进度。
             print('taxi:', proc_id, proc_id * '   ', current_event)  # <10>
             active_proc = self.procs[proc_id]  # <11>
-            next_time = sim_time + compute_duration(previous_action)  # <12>
+            next_time = sim_time + compute_duration(previous_action)  # <12> 计算下一个event的发生时间。
             try:
                 next_event = active_proc.send(next_time)  # <13>
             except StopIteration:
@@ -135,10 +91,13 @@ def main(end_time=DEFAULT_END_TIME, num_taxis=DEFAULT_NUMBER_OF_TAXIS,
     """Initialize random generator, build procs and run simulation"""
     if seed is not None:
         random.seed(seed)  # get reproducible results
-
+    
+    # map存储多个taxi的信息, key为taxi的编号, value为该编号taxi的行为描述协程taxi_process()
     taxis = {i: taxi_process(i, (i+1)*2, i*DEPARTURE_INTERVAL)
-             for i in range(num_taxis)}
+             for i in range(num_taxis)} 
+    #用map初始化Simulator对象
     sim = Simulator(taxis)
+    # 运行模拟器，模拟开始，taxi开始运营
     sim.run(end_time)
 
 
@@ -201,3 +160,53 @@ taxi: 1     Event(time=110, proc=1, action='going home')
 # END TAXI_SAMPLE_RUN
 
 """
+
+''' 
+simple test by hand
+==============
+
+Driving a taxi from the console::
+
+    >>> from taxi_sim import taxi_process
+    >>> taxi = taxi_process(ident=13, trips=2, start_time=0)
+    >>> next(taxi)
+    Event(time=0, proc=13, action='leave garage')
+    >>> taxi.send(_.time + 7)
+    Event(time=7, proc=13, action='pick up passenger')
+    >>> taxi.send(_.time + 23)
+    Event(time=30, proc=13, action='drop off passenger')
+    >>> taxi.send(_.time + 5)
+    Event(time=35, proc=13, action='pick up passenger')
+    >>> taxi.send(_.time + 48)
+    Event(time=83, proc=13, action='drop off passenger')
+    >>> taxi.send(_.time + 1)
+    Event(time=84, proc=13, action='going home')
+    >>> taxi.send(_.time + 10)
+    Traceback (most recent call last):
+      File "<stdin>", line 1, in <module>
+    StopIteration
+
+Sample run with two cars, random seed 10. This is a valid doctest::
+
+    >>> main(num_taxis=2, seed=10)
+    taxi: 0  Event(time=0, proc=0, action='leave garage')
+    taxi: 0  Event(time=5, proc=0, action='pick up passenger')
+    taxi: 1     Event(time=5, proc=1, action='leave garage')
+    taxi: 1     Event(time=10, proc=1, action='pick up passenger')
+    taxi: 1     Event(time=15, proc=1, action='drop off passenger')
+    taxi: 0  Event(time=17, proc=0, action='drop off passenger')
+    taxi: 1     Event(time=24, proc=1, action='pick up passenger')
+    taxi: 0  Event(time=26, proc=0, action='pick up passenger')
+    taxi: 0  Event(time=30, proc=0, action='drop off passenger')
+    taxi: 0  Event(time=34, proc=0, action='going home')
+    taxi: 1     Event(time=46, proc=1, action='drop off passenger')
+    taxi: 1     Event(time=48, proc=1, action='pick up passenger')
+    taxi: 1     Event(time=110, proc=1, action='drop off passenger')
+    taxi: 1     Event(time=139, proc=1, action='pick up passenger')
+    taxi: 1     Event(time=140, proc=1, action='drop off passenger')
+    taxi: 1     Event(time=150, proc=1, action='going home')
+    *** end of events ***
+
+See longer sample run at the end of this module.
+
+'''

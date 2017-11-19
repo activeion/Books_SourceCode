@@ -14,7 +14,7 @@ def averager():  # <1>
     count = 0
     average = None
     while True:
-        term = yield  # <2>
+        term = yield  # <2> 不产出任何东西, 最后由group.send(None)引发的return语句一次性返回所需数据
         if term is None:  # <3>
             break
         total += term
@@ -50,6 +50,10 @@ def report(results):
         print('{:2} {:5} averaging {:.2f}{}'.format(
               result.count, group, result.average, unit))
 
+def summarize(results):
+    while True:
+        result = yield from averager()
+        results.append(result)
 
 data = {
     'girls;kg':
@@ -61,17 +65,9 @@ data = {
     'boys;m':
         [1.38, 1.5, 1.32, 1.25, 1.37, 1.48, 1.25, 1.49, 1.46],
 }
-
-
-def summarize(results):
-    while True:
-        result = yield from averager()
-        results.append(result)
 # END YIELD_FROM_AVERAGER
 
 if __name__ == '__main__':
-    main(data)
-
     # Testing ``averager`` by itself::
     coro_avg = averager()
     next(coro_avg)
@@ -95,3 +91,5 @@ if __name__ == '__main__':
     summary.send(None)
     print(results)  # [ Result(count=10, average=1.4279999999999997), Result(count=9, average=1.3888888888888888) ]
 
+    # delegated by grouper
+    main(data)
