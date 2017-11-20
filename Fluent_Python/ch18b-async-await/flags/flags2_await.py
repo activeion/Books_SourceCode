@@ -2,9 +2,23 @@
 
 asyncio async/await version
 
+Sample run::
+
+➜  flags git:(dev) ✗ python flags2_await.py -s REMOTE
+
+REMOTE site: http://flupy.org/data/flags
+Searching for 20 flags: from BD to VN
+5 concurrent connections will be used.
+100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 20/20 [00:10<00:00,  1.89it/s]
+--------------------
+19 flags downloaded.
+1 error.
+Elapsed time: 10.60s
+
 """
 # BEGIN FLAGS2_ASYNCIO_TOP
 import asyncio
+import async_timeout
 import collections
 from contextlib import closing
 
@@ -27,17 +41,18 @@ class FetchError(Exception):  # <1>
 
 async def get_flag(base_url, cc): # <2>
     url = '{}/{cc}/{cc}.gif'.format(base_url, cc=cc.lower())
-    with closing(await aiohttp.request('GET', url)) as resp:
-        if resp.status == 200:
-            image = await resp.read()
-            return image
-        elif resp.status == 404:
-            raise web.HTTPNotFound()
-        else:
-            raise aiohttp.HttpProcessingError(
-                code=resp.status, message=resp.reason,
-                headers=resp.headers)
-
+    async with aiohttp.ClientSession() as session:         
+        with async_timeout.timeout(10):         
+            async with session.get(url) as resp:             
+                if resp.status == 200:
+                    image = await resp.read()  # <5>
+                    return image
+                elif resp.status == 404:
+                    raise web.HTTPNotFound()
+                else:
+                    raise aiohttp.HttpProcessingError(
+                        code=resp.status, message=resp.reason,
+                        headers=resp.headers)
 
 async def download_one(cc, base_url, semaphore, verbose):  # <3>
     try:

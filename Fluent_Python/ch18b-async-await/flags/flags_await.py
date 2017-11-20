@@ -4,23 +4,36 @@ asyncio + aiottp version
 
 Sample run::
 
-    $ python3 flags_asyncio.py
+    $ python3 flags_asyncio.py -s REMOTE
     EG VN IN TR RU ID US DE CN MX JP BD NG ET FR BR PH PK CD IR
     20 flags downloaded in 1.07s
 
 """
 # BEGIN FLAGS_ASYNCIO
 import asyncio
+import async_timeout
 
 import aiohttp  # <1>
 
 from imported.flags import BASE_URL, save_flag, show, main  # <2>
 
+"""
+async def fetch(session, url):     
+    with async_timeout.timeout(10):         
+        async with session.get(url) as response:             
+            return await response.text()  
+async def main():     
+    async with aiohttp.ClientSession() as session:         
+        html = await fetch(session, 'http://python.org')         
+        print(html)
+"""
 
 async def get_flag(cc):  # <3>
     url = '{}/{cc}/{cc}.gif'.format(BASE_URL, cc=cc.lower())
-    resp = await aiohttp.request('GET', url)  # <4>
-    image = await resp.read()  # <5>
+    async with aiohttp.ClientSession() as session:         
+        with async_timeout.timeout(10):         
+            async with session.get(url) as resp:             
+                image = await resp.read()  # <5>
     return image
 
 
