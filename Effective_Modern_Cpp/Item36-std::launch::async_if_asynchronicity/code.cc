@@ -28,6 +28,30 @@ reallyAsync(F&& f, Ts&&... params)
                     std::forward<Ts>(params)...);
 }
 
+
+/**********************************************************************
+发信人: ziqin (子青|会挽雕弓如满月|西北望|射天狼), 信区: CPlusPlus
+标  题: Re: 感觉std::async就是个废物。
+发信站: 水木社区 (Mon Nov 20 18:58:19 2017), 站内
+
+简单来说，不能
+
+扩展一下来说，std::async提供的是更底层的功能
+
+展开来说，std::async是在<future>里的，是task的抽象, std::thread是在
+<thread>里的，是execution sequence的抽象。需要把两个组合在一起才是你要的
+线程池
+
+喷子来说，就是你逻辑不清，thread是什么？是一段代码的顺序执行，是一段，不
+是多段，没人给你做调度。(大家常说的)thread pool严格来说根本就不是thread pool，而是
+worker pool，你需要有worker function来调度异步task，你扔进去的永远是一个
+异步的task，thread本身运行的是worker function。那么你怎么生成一个抽象的
+task的object来异步调度？用<future>里的东西，不管你用task_package还是
+promise，还是async，殊途同归。这就是为什么这三个叫provider. async逻辑上来
+说根本就不应该设计那个async policy，那个只是给你省点代码，省点系统资源而
+已。所以前面有人告诉你进thread pool永远要用deferred.
+**********************************************************************/
+
 int main(void)
 {
     {
