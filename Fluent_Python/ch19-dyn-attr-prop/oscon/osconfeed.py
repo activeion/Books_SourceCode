@@ -25,16 +25,14 @@ def load():
 
 # END OSCONFEED
 
-# BEGIN OSCONFEED_DEMO
-
-feed = load()  # <1>
-sorted(feed['Schedule'].keys())  # <2> ['conferences', 'events', 'speakers', 'venues']
-for key, value in sorted(feed['Schedule'].items()):
-    print('{:3} {}'.format(len(value), key))  # <3> 1 conferences 484 events 357 speakers 53 venues
-print(feed['Schedule']['speakers'][-1]['name']) # <4> 'Carina C. Zona'
-print(feed['Schedule']['speakers'][-1]['serial']) # <5> 141590
-print(feed['Schedule']['events'][40]['name']) # 'There *Will* Be Bugs'
-print(feed['Schedule']['events'][40]['speakers']) # <6> [3471, 5199]
-
-
-# END OSCONFEED_DEMO
+if __name__ == '__main__':
+    # BEGIN OSCONFEED_DEMO
+    feed = load()  # <1>
+    sorted(feed['Schedule'].keys())  # <2> ['conferences', 'events', 'speakers', 'venues']
+    for key, value in sorted(feed['Schedule'].items()):
+        print('{:3} {}'.format(len(value), key))  # <3> 1 conferences 484 events 357 speakers 53 venues
+    print(feed['Schedule']['speakers'][-1]['name']) # <4> 'Carina C. Zona'
+    print(feed['Schedule']['speakers'][-1]['serial']) # <5> 141590
+    print(feed['Schedule']['events'][40]['name']) # 'There *Will* Be Bugs'
+    print(feed['Schedule']['events'][40]['speakers']) # <6> [3471, 5199]
+    # END OSCONFEED_DEMO

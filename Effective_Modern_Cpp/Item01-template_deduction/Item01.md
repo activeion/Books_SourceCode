@@ -28,11 +28,11 @@ int x = 0;
 
 具体有以下3中情况
 - ParamType是指针类型或者引用类型，但不是通用引用(universal references)类型
-    - 忽略引用，保留const
+    - 忽略实参expr的指针或者引用(为了避免与ParamType中的指针或者引用重复)，但保留expr的const
 - ParamType是通用引用(universal references)类型
-    - 忽略引用，保留const
+    - 忽略实参expr的引用，但保留expr的const
 - ParamType既不是指针类型也不是引用类型
-    - 忽略引用，忽略const
+    - 忽略实参expr的引用(pass-by-value的需要)，而且忽略expr的const(pass-by-value的需要)
 
 ## 情况1 ParamType 是指针类型或者引用类型，但不是通用引用(universal references)类型
 
@@ -86,24 +86,24 @@ f(px);   // T的类型为const int，ParamType的类型为const int*
 ## 情况2 ParamType 是通用引用(universal references)类型
 
 首先要知道什么是universal refences，可以在google或者baidu，懒得搜索的可以直接看这里。简单来说就是type&& + syntax + type deduction，即可以引用左值，也可以引用右值。 
-这种情况也有两个原则
 
-如果expr是一个左值，那么T和ParamType会被推断为左值引用
-如果expr是一个右值，那么会用正常的推断方式(情况1)
-(和情况1相同，const属性可以代入模板函数内部)
+事情变得不那么明显了，形参虽然被声明为右值引用(比如函数模板采用了T类型，函数模板的形参声明为T&&)，当实参为一个左值引用的时候，推导行为和通常的推导方式并不相同。完整的解释可以参考Item24，这里仅仅给出一个简化版本：
+- 如果expr是一个左值，那么T和ParamType会被推断为左值引用。这一点不是太容易理解。首先，这是类型推导中唯一出现的情形：T被推导为一个引用。第二，虽然Param形式上是一个右值引用，但却被推导为一个左值引用。
+- 如果expr是一个右值，那么会用正常的推断方式(情况1) (和情况1相同，const属性可以代入模板函数内部)
+
 可以看以下代码
 ```
 template <typename T>
 void f(T&& param);
 
-int x = 27;
+int x = 49;
 const int cx = x;
 const int &rx = x;
 
-f(x);  // x是左值，所以T 和ParamType会被推断为int &类型
+f(x);  // x是左值，所以T和ParamType会被推断为int &类型
 f(cx); // cx是左值，所以T和ParamType会被推断为const int &类型
-f(rx);  // rx是左值，所以T和 ParamType会被推断为const int &类型
-f(27);`  // 27是右值，根据情况1，T的类型会被推断为int、ParamType会被推断为int &&
+f(rx); // rx是左值，所以T和ParamType会被推断为const int &类型
+f(27); // 27是右值，根据情况1，T的类型会被推断为int、ParamType会被推断为int &&
 ```
 ## 情况3 ParamType 既不是指针类型也不是引用类型
 
@@ -112,28 +112,33 @@ f(27);`  // 27是右值，根据情况1，T的类型会被推断为int、ParamTy
 template <typename T>
 void f(T param);    // 此处会有拷贝(构造)
 ```
-T 的类型推断主要依赖于传进来的参数expr
+这意味着param将是一个传入参数的拷贝 - 一个全新的对象。这一事实motivates从expr推导T的规则(T 的类型推断主要依赖于传进来的参数expr):
+1. 和以前一样，如果expr的类型是引用类型，那么忽略引用
+2. 忽略掉expr的引用以后，如果expr 的类型是const的，把const也忽略了，还会忽略volatile(volatile对象用的比较少，一般它用于实现设备驱动。参见Item40)。
 
-如果expr的类型是引用类型，那么忽略引用
-通过了上面的检测(无论是不是引用类型)后，如果expr 的类型是const的，把const也忽略了，还会忽略volatile。
 给出下面的例子
 ```
 int x = 27;
 const int cx = x;
 const int &rx = x;
-```
-和之前的例子一样
-```
+
 f(x);   // 易知T和ParamType的类型都是int
 f(cx);  // 忽略const，T和ParamType的类型都是int
 f(rx);  // 忽略了引用后再忽略const,T和ParamType的类型都是int
 ```
-虽说cx和rx都是const修饰的，但是param是值语义，所以param只是拷贝了cx和rx的值，并可以改变值。这就是为什么会忽略const，因为传进的参数expr 尽管不可以改变值，但并不意味着他们的拷贝不可以。
+注意虽说cx和rx都代表const数值，但是param不是const。这是合理的，param是一个完全独立于cx和rx的对象-cx和rx的拷贝。cx和rx不能被修改的事实其实和param能否被修改毫无关系。这就是为何expr的const和volatile被忽略的原因：仅仅因为expr不能被修改并不意味着它的副本不能被修改。
 
-如果我们定义一个指向常量的常量指针 
-`const char* const ptr = "Fun with pointers"; `
+认识到传值过程中const、volatile被忽略是非常重要的。就像我们已经看到的那样，引用传参或者指针传参时expr的const是被保留的。但是考虑下面这种情形，expr是一个指向const对象的const指针，并且expr通过传值给形参param:
+```
+template<typename T>
+void f(T param); //param is still passed by value
+
+const char* const ptr = // ptr is const pointer to const object
+    "Fun with pointers";
+```
 然后调用函数 
 `f(ptr);` 
+这里，`*`右边的const表明ptr指针ptr是常量: 指针ptr不能指向其他的不同地址，也不能被清零null。（`*`左侧的const说明ptr指向的对象-字符串-是常量，因此不能被修改。）当ptr被传递给函数f的时候，ptr的内容被复制给形参param。这种情况下，ptr将是passed-by-value。根据传值得类型推导规则，ptr的const将被忽略，类型推导后，param的类型将变为`const char *`，也就是说，只一个可以被修改的指针，它指向一个字符串常量。也就是说，在ptr拷贝给一个新的指针param的过程中，ptr所指向的对象的const修饰符被保留了，而ptr自身的const修饰符却被忽略了。
 这个时候T 和 ParamType的类型会被推断为`const char *`，这是因为这种情况下传入的参数都会被函数拷贝并可以改变的，所以指针是可以指向不同的地址，个人理解在情况3是只会忽略 顶层const，然后保留 底层const。
 
 ## 数组作为参数
