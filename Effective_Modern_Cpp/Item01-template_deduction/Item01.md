@@ -4,7 +4,7 @@
  分类： Effective Modern C++（37）  
 http://blog.csdn.net/big_yellow_duck/article/details/52140262#comments
 
-理解模板类型推断
+## 理解模板类型推断
 
 C++11的auto自动推断变量的方式是以模板推断为基础的，模板推断的规则也应用在auto上，所以理解掌握模板推断的规则对于我们C++程序员来说很重要。
 ```
@@ -156,10 +156,10 @@ void f(T& param);
 我们把数组作为参数传入函数 
 f(name); // T 的类型会被推断为const char [13] 
 这个时候T 的类型会被推断为有长度的数组，在这个例子中T 的类型会被推断为const char [13]，ParamType的类型会是 const char (&) [13] 
-在这里引用一段书中的原话，这规则有毒….
+在这里引用一段书中的原话，这语法有毒….
+> Yes, the syntax looks toxic, but knowing it will score you mondo points with those few souls who care.
 
-Yes, the syntax looks toxic, but knowing it will score you mondo points with those few souls who care.
-利用这个特性可以写一个模板，用来返回数组的长度
+利用这个特性可以写一个模板，用来返回数组的长度:
 ```
 template <typename T, std::size_t N>
 constexpr std::size_t arraySize(T (&)[N]) noexcept
@@ -172,7 +172,6 @@ constexpr std::size_t arraySize(T (&)[N]) noexcept
 ## 函数作为参数
 
 因为函数像数组一样可以转化为指针，所以函数作为参数与数组类似，例子如下
-
 `void someFunc(int, double); `
 
 情况3 
