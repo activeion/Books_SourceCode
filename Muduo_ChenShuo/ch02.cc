@@ -78,13 +78,13 @@ class Request
             muduo::MutexLockGuard lock(mutex_);
             g_inventory.add(this);
             // ...
-            //print();//本来没有这一行，某人为了调试程序不小心添加的。导致死锁
+            //print();//本来没有这一行，某人为了调试程序不小心添加的。导致线程内死锁
         }
 
         ~Request() __attribute__ ((noinline))
         {
             muduo::MutexLockGuard lock(mutex_);
-            sleep(1);
+            sleep(1);//sleep醒来的时候，会将mutex_.__data.__lock变为2!!!
             g_inventory.remove(this);
         }
 
