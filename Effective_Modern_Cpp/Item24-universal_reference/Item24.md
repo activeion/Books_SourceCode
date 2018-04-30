@@ -48,13 +48,13 @@ template<typename T>
 void f(T&& param);              // param是一个universal引用
 
 Widget w;
-f(w);                           // 左值被传给f，param的类型是
+f(w);                           // 左值w被传给函数f，param的类型是
                                 // Widget&（也就是一个左值引用）
 
 f(std::move(w));                // 右值被传给f，param的类型是
                                 // Widget&&（也就是一个右值引用）
 ```
-要让一个引用成为universal引用，类型推导是其必要不补充条件。引用声明的格式必须同时正确才行，而且格式很严格。它必须正好是“T&&”。再看一次这个我们之前在示例代码中看过的例子：
+要让一个引用成为universal引用，类型推导是其必要不充分条件。引用声明的格式必须同时正确才行，而且格式很严格。它必须正好是“T&&”。再看一次这个我们之前在示例代码中看过的例子：
 
 ```
 template<typename T>
