@@ -2,12 +2,17 @@
 #include <set>
 #include <iostream>
 #include <unistd.h> // for sleep()
+#include <functional>
 
 //#define CHECK_PTHREAD_RETURN_VALUE
 #include <muduo/base/Mutex.h>
 #include <muduo/base/Thread.h>
+#include <muduo/base/CountDownLatch.h>
+#include <muduo/base/BlockingQueue.h>
 
-
+#include <boost/ptr_container/ptr_vector.hpp>
+#include <cstdio>
+#include <string.h>
 
 // 2.1.1 只使用非递归的mutex
 class Foo;
@@ -184,6 +189,92 @@ namespace version2
 
 }
 
+// 2.2 条件变量
+class Test
+{
+ public:
+  Test(int numThreads)
+    : latch_(numThreads)
+  {
+    for (int i = 0; i < numThreads; ++i)
+    {
+      char name[32];
+      snprintf(name, sizeof name, "work thread %d", i);
+      threads_.emplace_back(new muduo::Thread(
+            std::bind(&Test::threadFunc, this), muduo::string(name)));
+    }
+    for (auto& thr : threads_)
+    {
+      thr->start();
+    }
+  }
+
+  void run(int times)
+  {
+    printf("waiting for count down latch\n");
+    latch_.wait();
+    printf("all threads started\n");
+    for (int i = 0; i < times; ++i)
+    {
+      char buf[32];
+      snprintf(buf, sizeof buf, "hello %d", i);
+      queue_.put(buf);
+      printf("tid=%d, put data = %s, size = %zd\n", muduo::CurrentThread::tid(), buf, queue_.size());
+    }
+  }
+
+  void joinAll()
+  {
+    for (size_t i = 0; i < threads_.size(); ++i)
+    {
+      queue_.put("stop");
+    }
+
+    for (auto& thr : threads_)
+    {
+      thr->join();
+    }
+  }
+
+ private:
+
+  void threadFunc()
+  {
+    printf("tid=%d, %s started\n",
+           muduo::CurrentThread::tid(),
+           muduo::CurrentThread::name());
+
+    latch_.countDown();
+    bool running = true;
+    while (running)
+    {
+      std::string d(queue_.take());
+      printf("tid=%d, get data = %s, size = %zd\n", muduo::CurrentThread::tid(), d.c_str(), queue_.size());
+      running = (d != "stop");
+    }//取出"stop"则running=false, 退出while
+
+    printf("tid=%d, %s stopped\n",
+           muduo::CurrentThread::tid(),
+           muduo::CurrentThread::name());
+  }
+
+  muduo::BlockingQueue<std::string> queue_;
+  muduo::CountDownLatch latch_;
+  std::vector<std::unique_ptr<muduo::Thread>> threads_;
+};
+
+void testMove()
+{
+  muduo::BlockingQueue<std::unique_ptr<int>> queue;
+  queue.put(std::unique_ptr<int>(new int(42)));
+  std::unique_ptr<int> x = queue.take();
+  printf("took %d\n", *x);//"took 42"
+  *x = 123;
+  queue.put(std::move(x));
+  std::unique_ptr<int> y = queue.take();
+  printf("took %d\n", *y);//"took 123"
+}
+
 int main(void)
 {
     {// 2.1.1
@@ -220,6 +311,17 @@ int main(void)
     }
 
     std::cout << std::endl;
+
+    {//2.2 条件变量 recipe/thread/test/BlockQueue_test.cc
+      printf("pid=%d, tid=%d\n", ::getpid(), muduo::CurrentThread::tid());
+      Test t(5);//5个子线程，负责不停地从t.queue_中取字符串，直到取出"stop"字符串为止。
+      t.run(100);//5个线程全部启动后，latch_.wait()不再阻塞，连续向t.queue_中放入100个字符串"hello %d"
+      t.joinAll();//queue_中放入5个"stop"字符串
+
+      testMove();//验证std::unique_ptr的移动功能
+
+      printf("number of created threads %d\n", muduo::Thread::numCreated());
+    }
 
     return 0;
 }
