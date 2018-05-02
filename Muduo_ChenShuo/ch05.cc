@@ -12,25 +12,29 @@ int main(int argc, char* argv[])
 {
 
     {//Logging
+        //#define LOG_INFO \
+        //if (muduo::Logger::logLevel() <= muduo::Logger::INFO) \
+        //muduo::Logger(__FILE__, __LINE__).stream()
         LOG_INFO << "EventLoop created ";
         // 使用s+fin大发调试可以发现：
-        // 秘密都藏在Logger类的析构函数中
+        // 秘密都藏在muduo::Logger类的析构函数中
         /*
            Logger::~Logger()
            {
-           impl_.finish();
-           const LogStream::Buffer& buf(stream().buffer());
-           g_output(buf.data(), buf.length());
-           if (impl_.level_ == FATAL)
-           {
-           g_flush();
-           abort();
-           }
+               impl_.finish();
+               const LogStream::Buffer& buf(stream().buffer());
+               g_output(buf.data(), buf.length());
+               if (impl_.level_ == FATAL)
+               {
+                   g_flush();
+                   abort();
+               }
            }
            析构函数调用g_output()这个函数调用defaultOutput(),
            将buf中的数据打印到屏幕！
-           Logger.stream_成员是一个LogStream类对象，LogStream类仅仅是一个提供了>>操作符的buffer!
-           */
+           muduo::Logger.stream_成员是一个muduo::LogStream类对象，
+           muduo::LogStream类仅仅是一个提供了>>操作符的buffer!
+       */
     }
 
     {//AsyncLogging
@@ -52,10 +56,11 @@ int main(int argc, char* argv[])
         g_asyncLog = &log;
 
         bool longLog = argc > 1;
-        //bench(longLog);
-        //void bench(bool longLog)
+
         {//负责向缓冲区写入数据
-            muduo::Logger::setOutput([](const char* msg, int len){g_asyncLog->append(msg, len);});
+            //g_asyncLog保存了文件信息，因此向文件写log数据
+            muduo::Logger::setOutput([](const char* msg, int len)
+                    {g_asyncLog->append(msg, len);});
 
             int cnt = 0;
             const int kBatch = 1000;
@@ -68,7 +73,10 @@ int main(int argc, char* argv[])
                 muduo::Timestamp start = muduo::Timestamp::now();
                 for (int i = 0; i < kBatch; ++i)
                 {
-                    LOG_INFO << "Hello 0123456789" << " abcdefghijklmnopqrstuvwxyz "
+                    //Logger析构时，将log数据(保存在buffer_)
+                    //输出到setOutput函数设定的lambda
+                    LOG_INFO << "Hello 0123456789" 
+                        << " abcdefghijklmnopqrstuvwxyz "
                         << (longLog ? longStr : empty)
                         << cnt;
                     ++cnt;

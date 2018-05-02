@@ -2,7 +2,7 @@ CXXFLAGS = -O0 -g3  -I ../.. -pthread #-g3可以让gdb展开宏, print命令
 LDFLAGS = -lpthread -lmuduo_net -lmuduo_base
 BASE_SRC = 
 LIB_SRC =
-BINARIES = ch01 ch02 ch05 ch08
+BINARIES = ch01 ch02 ch05 
 HEADERS=$(wildcard *.h)
 
 all: $(BINARIES)
@@ -22,4 +22,3 @@ ch02: ch02.cc
 
 ch05: ch05.cc
 
-ch08: ch08.cc
