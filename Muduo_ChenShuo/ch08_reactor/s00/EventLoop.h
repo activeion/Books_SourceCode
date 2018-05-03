@@ -8,12 +8,12 @@
 #ifndef MUDUO_NET_EVENTLOOP_H
 #define MUDUO_NET_EVENTLOOP_H
 
-#include "thread/Thread.h"
+#include <muduo/base/Thread.h>
 
 namespace muduo
 {
 
-class EventLoop : boost::noncopyable
+class EventLoop : muduo::noncopyable
 {
  public:
 

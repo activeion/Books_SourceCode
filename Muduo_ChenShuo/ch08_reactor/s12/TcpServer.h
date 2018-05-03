@@ -12,7 +12,7 @@
 #include "TcpConnection.h"
 
 #include <map>
-#include <boost/noncopyable.hpp>
+#include <muduo/base/noncopyable.h>
 #include <boost/scoped_ptr.hpp>
 
 namespace muduo
@@ -22,7 +22,7 @@ class Acceptor;
 class EventLoop;
 class EventLoopThreadPool;
 
-class TcpServer : boost::noncopyable
+class TcpServer : muduo::noncopyable
 {
  public:
 

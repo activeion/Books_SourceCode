@@ -11,7 +11,7 @@
 #include <map>
 #include <vector>
 
-#include "datetime/Timestamp.h"
+#include <muduo/base/Timestamp.h>
 #include "EventLoop.h"
 
 struct epoll_event;
@@ -25,7 +25,7 @@ class Channel;
 /// IO Multiplexing with epoll(4).
 ///
 /// This class doesn't own the Channel objects.
-class EPoller : boost::noncopyable
+class EPoller : muduo::noncopyable
 {
  public:
   typedef std::vector<Channel*> ChannelList;

@@ -9,9 +9,9 @@
 #define MUDUO_NET_CHANNEL_H
 
 #include <boost/function.hpp>
-#include <boost/noncopyable.hpp>
+#include <muduo/base/noncopyable.h>
 
-#include <datetime/Timestamp.h>
+#include <muduo/base/Timestamp.h>
 
 namespace muduo
 {
@@ -24,7 +24,7 @@ class EventLoop;
 /// This class doesn't own the file descriptor.
 /// The file descriptor could be a socket,
 /// an eventfd, a timerfd, or a signalfd
-class Channel : boost::noncopyable
+class Channel : muduo::noncopyable
 {
  public:
   typedef boost::function<void()> EventCallback;

@@ -1,6 +1,7 @@
 #include "EventLoop.h"
-#include "thread/Thread.h"
+#include <muduo/base/Thread.h>
 #include <stdio.h>
+#include <unistd.h>         // getpid()
 
 void threadFunc()
 {

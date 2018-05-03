@@ -13,7 +13,7 @@
 
 #include <boost/any.hpp>
 #include <boost/enable_shared_from_this.hpp>
-#include <boost/noncopyable.hpp>
+#include <muduo/base/noncopyable.h>
 #include <boost/scoped_ptr.hpp>
 #include <boost/shared_ptr.hpp>
 
@@ -27,7 +27,7 @@ class Socket;
 ///
 /// TCP connection, for both client and server usage.
 ///
-class TcpConnection : boost::noncopyable,
+class TcpConnection : muduo::noncopyable,
                       public boost::enable_shared_from_this<TcpConnection>
 {
  public:

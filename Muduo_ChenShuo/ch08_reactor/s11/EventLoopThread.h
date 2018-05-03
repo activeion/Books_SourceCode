@@ -8,18 +8,18 @@
 #ifndef MUDUO_NET_EVENTLOOPTHREAD_H
 #define MUDUO_NET_EVENTLOOPTHREAD_H
 
-#include "thread/Condition.h"
-#include "thread/Mutex.h"
-#include "thread/Thread.h"
+#include <muduo/base/Condition.h>
+#include <muduo/base/Mutex.h>
+#include <muduo/base/Thread.h>
 
-#include <boost/noncopyable.hpp>
+#include <muduo/base/noncopyable.h>
 
 namespace muduo
 {
 
 class EventLoop;
 
-class EventLoopThread : boost::noncopyable
+class EventLoopThread : muduo::noncopyable
 {
  public:
   EventLoopThread();

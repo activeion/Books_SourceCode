@@ -11,10 +11,10 @@
 #include <set>
 #include <vector>
 
-#include <boost/noncopyable.hpp>
+#include <muduo/base/noncopyable.h>
 
-#include "datetime/Timestamp.h"
-#include "thread/Mutex.h"
+#include <muduo/base/Timestamp.h>
+#include <muduo/base/Mutex.h>
 #include "Callbacks.h"
 #include "Channel.h"
 
@@ -29,7 +29,7 @@ class TimerId;
 /// A best efforts timer queue.
 /// No guarantee that the callback will be on time.
 ///
-class TimerQueue : boost::noncopyable
+class TimerQueue : muduo::noncopyable
 {
  public:
   TimerQueue(EventLoop* loop);

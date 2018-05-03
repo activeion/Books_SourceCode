@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <sys/timerfd.h>
+#include <strings.h> //bzero()
 
 muduo::EventLoop* g_loop;
 

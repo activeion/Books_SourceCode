@@ -8,9 +8,9 @@
 #ifndef MUDUO_NET_EVENTLOOP_H
 #define MUDUO_NET_EVENTLOOP_H
 
-#include "datetime/Timestamp.h"
-#include "thread/Mutex.h"
-#include "thread/Thread.h"
+#include <muduo/base/Timestamp.h>
+#include <muduo/base/Mutex.h>
+#include <muduo/base/Thread.h>
 #include "Callbacks.h"
 #include "TimerId.h"
 
@@ -24,7 +24,7 @@ class Channel;
 class EPoller;
 class TimerQueue;
 
-class EventLoop : boost::noncopyable
+class EventLoop : muduo::noncopyable
 {
  public:
   typedef boost::function<void()> Functor;

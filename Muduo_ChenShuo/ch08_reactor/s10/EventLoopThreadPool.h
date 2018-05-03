@@ -8,14 +8,14 @@
 #ifndef MUDUO_NET_EVENTLOOPTHREADPOOL_H
 #define MUDUO_NET_EVENTLOOPTHREADPOOL_H
 
-#include "thread/Condition.h"
-#include "thread/Mutex.h"
-#include "thread/Thread.h"
+#include <muduo/base/Condition.h>
+#include <muduo/base/Mutex.h>
+#include <muduo/base/Thread.h>
 
 
 #include <vector>
 #include <boost/function.hpp>
-#include <boost/noncopyable.hpp>
+#include <muduo/base/noncopyable.h>
 #include <boost/ptr_container/ptr_vector.hpp>
 
 namespace muduo
@@ -24,7 +24,7 @@ namespace muduo
 class EventLoop;
 class EventLoopThread;
 
-class EventLoopThreadPool : boost::noncopyable
+class EventLoopThreadPool : muduo::noncopyable
 {
  public:
   EventLoopThreadPool(EventLoop* baseLoop);

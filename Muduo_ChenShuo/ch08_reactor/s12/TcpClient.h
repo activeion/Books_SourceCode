@@ -8,9 +8,9 @@
 #ifndef MUDUO_NET_TCPCLIENT_H
 #define MUDUO_NET_TCPCLIENT_H
 
-#include <boost/noncopyable.hpp>
+#include <muduo/base/noncopyable.h>
 
-#include "thread/Mutex.h"
+#include <muduo/base/Mutex.h>
 #include "TcpConnection.h"
 
 namespace muduo
@@ -19,7 +19,7 @@ namespace muduo
 class Connector;
 typedef boost::shared_ptr<Connector> ConnectorPtr;
 
-class TcpClient : boost::noncopyable
+class TcpClient : muduo::noncopyable
 {
  public:
   TcpClient(EventLoop* loop,

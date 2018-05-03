@@ -13,7 +13,7 @@
 
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/function.hpp>
-#include <boost/noncopyable.hpp>
+#include <muduo/base/noncopyable.h>
 #include <boost/scoped_ptr.hpp>
 
 namespace muduo
@@ -22,7 +22,7 @@ namespace muduo
 class Channel;
 class EventLoop;
 
-class Connector : boost::noncopyable
+class Connector : muduo::noncopyable
 {
  public:
   typedef boost::function<void (int sockfd)> NewConnectionCallback;

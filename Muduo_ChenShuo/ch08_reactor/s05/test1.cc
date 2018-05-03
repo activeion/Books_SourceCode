@@ -1,5 +1,5 @@
 #include "EventLoop.h"
-#include "thread/Thread.h"
+#include <muduo/base/Thread.h>
 #include <stdio.h>
 
 void threadFunc()

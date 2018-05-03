@@ -8,8 +8,8 @@
 #ifndef MUDUO_NET_CHANNEL_H
 #define MUDUO_NET_CHANNEL_H
 
-#include <boost/function.hpp>
-#include <boost/noncopyable.hpp>
+#include <functional>
+#include <muduo/base/noncopyable.h
 
 namespace muduo
 {
@@ -22,10 +22,10 @@ class EventLoop;
 /// This class doesn't own the file descriptor.
 /// The file descriptor could be a socket,
 /// an eventfd, a timerfd, or a signalfd
-class Channel : boost::noncopyable
+class Channel : noncopyable
 {
  public:
-  typedef boost::function<void()> EventCallback;
+  typedef std::function<void()> EventCallback;
 
   Channel(EventLoop* loop, int fd);
 

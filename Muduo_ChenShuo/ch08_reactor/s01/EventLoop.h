@@ -8,7 +8,7 @@
 #ifndef MUDUO_NET_EVENTLOOP_H
 #define MUDUO_NET_EVENTLOOP_H
 
-#include "thread/Thread.h"
+#include <muduo/base/Thread.h>
 
 #include <boost/scoped_ptr.hpp>
 #include <vector>
@@ -19,7 +19,7 @@ namespace muduo
 class Channel;
 class Poller;
 
-class EventLoop : boost::noncopyable
+class EventLoop : muduo::noncopyable
 {
  public:
 
