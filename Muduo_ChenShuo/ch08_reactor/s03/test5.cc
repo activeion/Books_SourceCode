@@ -27,7 +27,12 @@ void run1()
 {
   g_flag = 1;
   printf("run1(): pid = %d, flag = %d\n", getpid(), g_flag);
-  g_loop->runInLoop(run2);
+  g_loop->runInLoop(run2); 
+  //本函数与loop.loop()死循环无关，
+  //将这个函数命名为runInLoopThread更加名副其实。
+  //并不是指在loop循环中运行，而是指在Loop所在的线程运行。
+  //如果当前线程是Loop所在线程则立即运行run2，如果不是，
+  //则需要强行将poll唤醒，调用doPendingFunctor()来运行run2
   g_flag = 2;
 }
 

@@ -9,7 +9,7 @@
 #define MUDUO_NET_CHANNEL_H
 
 #include <functional>
-#include <muduo/base/noncopyable.h
+#include <muduo/base/noncopyable.h>
 
 namespace muduo
 {

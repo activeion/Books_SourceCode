@@ -183,8 +183,14 @@ void EventLoop::handleRead()
 }
 
 void EventLoop::doPendingFunctors()
-{
-  std::vector<Functor> functors;
+{ 
+  // 客户端断开连接，则pendingFunctors_非空，
+  // functors.swap以后，局部变量functors将持有函数对象，
+  // 间接持有了函数对象的参数conn，conn是一个shared_ptr
+  // functors析构的时候，也析构了conn(如果用户没有持有这个conn的话)
+  // 这里是TcpConnection& conn作为一个functor的参数被最终析构的地方:
+  // TcpConnection的墓地
+  std::vector<Functor> functors; 
   callingPendingFunctors_ = true;
 
   {

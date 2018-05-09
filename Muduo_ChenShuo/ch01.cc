@@ -311,12 +311,12 @@ namespace version5
                     std::weak_ptr<StockFactory> wkFactory{std::weak_ptr<StockFactory>(shared_from_this())};
                     pStock.reset(new Stock(key), 
                             [&](Stock* stock){
-                            printf("lambdaDeleteStock[%p]\n", stock);
-                            if (stock) {
-                            muduo::MutexLockGuard lock(mutex_);
-                            stocks_.erase(stock->key());  // This is wrong, see removeStock below for correct implementation.
-                            }
-                            delete stock;  // sorry, I lied
+                                printf("lambdaDeleteStock[%p]\n", stock);
+                                if (stock) {
+                                    muduo::MutexLockGuard lock(mutex_);
+                                    stocks_.erase(stock->key());  // This is wrong, see removeStock below for correct implementation.
+                                }
+                                delete stock;  // sorry, I lied
                             });
                     wkStock = pStock;
                 }

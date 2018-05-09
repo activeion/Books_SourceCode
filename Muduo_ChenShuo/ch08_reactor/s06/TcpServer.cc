@@ -60,24 +60,29 @@ void TcpServer::newConnection(int sockfd, const InetAddress& peerAddr)
            << "] from " << peerAddr.toHostPort();
   InetAddress localAddr(sockets::getLocalAddr(sockfd));
   // FIXME poll with zero timeout to double confirm the new connection
-  TcpConnectionPtr conn(
+  TcpConnectionPtr conn(//创建了shared_ptr conn, use_count=1
       new TcpConnection(loop_, connName, sockfd, localAddr, peerAddr));
-  connections_[connName] = conn;
+  connections_[connName] = conn;//use_count=2
   conn->setConnectionCallback(connectionCallback_);
   conn->setMessageCallback(messageCallback_);
   conn->setCloseCallback(
       boost::bind(&TcpServer::removeConnection, this, _1));
   conn->connectEstablished();
-}
+}//use_count=1
 
 void TcpServer::removeConnection(const TcpConnectionPtr& conn)
 {
   loop_->assertInLoopThread();
   LOG_INFO << "TcpServer::removeConnection [" << name_
-           << "] - connection " << conn->name();
+           << "] - connection " << conn->name() << ", use_count="<<conn.use_count();
+  //use_count=2, <1> connections_容器元素; <2> conn, 一个右值(shared_from_this()返回值)的左值引用
   size_t n = connections_.erase(conn->name());
+  LOG_INFO << "After erase, use_count()=" << conn.use_count();//use_count=1, conn
   assert(n == 1); (void)n;
-  loop_->queueInLoop(
+  loop_->queueInLoop(//TcpConnection& conn被存入boost::function对象中，
+          //直到connectDestroyed()执行完毕后，swap到局部变量，导致ref--, 然后彻底销毁
       boost::bind(&TcpConnection::connectDestroyed, conn));
+  LOG_INFO << "After bind, use_count()=" << conn.use_count();//use_count=2
+  //use_count=2， <1> pendingFunctors_容器; <2> conn
 }
 

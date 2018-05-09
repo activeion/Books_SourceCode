@@ -1,9 +1,11 @@
 CXXFLAGS = -O0 -g -pthread #-I ../.. -g3可以让gdb展开宏, print命令
 LDFLAGS = -lpthread -lmuduo_net -lmuduo_base
 BASE_SRC =
-LIB_SRC = EventLoop.cc Poller.cc Channel.cc Timer.cc TimerQueue.cc EventLoopThread.cc \
-	  Acceptor.cc Socket.cc SocketsOps.cc InetAddress.cc
-BINARIES = test1 test2 test3 test4 test5 test6 test7
+LIB_SRC = EventLoop.cc \
+	  Poller.cc Channel.cc \
+	  Timer.cc TimerQueue.cc EventLoopThread.cc \
+	  Acceptor.cc Socket.cc SocketsOps.cc InetAddress.cc # s04
+BINARIES = test7
 HEADERS=$(wildcard *.h)
 
 all: $(BINARIES)
@@ -14,12 +16,4 @@ $(BINARIES):
 clean:
 	        rm -f $(BINARIES) core
 
-
-
-test1: test1.cc
-test2: test2.cc
-test3: test3.cc
-test4: test4.cc
-test5: test5.cc
-test6: test6.cc
-test7: test7.cc
+test7: test7.cc # s04

@@ -1,12 +1,14 @@
 CXXFLAGS = -O0 -g -pthread #-I ../.. -g3可以让gdb展开宏, print命令
 LDFLAGS = -lpthread -lmuduo_net -lmuduo_base
 BASE_SRC =
-LIB_SRC = EventLoop.cc Poller.cc Channel.cc Timer.cc TimerQueue.cc EventLoopThread.cc \
+LIB_SRC = EventLoop.cc \
+	  Poller.cc Channel.cc \
+	  Timer.cc TimerQueue.cc EventLoopThread.cc \
 	  Acceptor.cc Socket.cc SocketsOps.cc InetAddress.cc \
 	  TcpConnection.cc TcpServer.cc \
 	  Buffer.cc \
 	  EventLoopThreadPool.cc \
-	  TcpClient.cc
+	  TcpClient.cc # s12
 BINARIES = test1 test2 test3 test4 test5 test6 test7 test8 test9 test10
 HEADERS=$(wildcard *.h)
 

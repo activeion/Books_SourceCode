@@ -1,11 +1,16 @@
 #!/bin/sh
 
+# 产生命令文本的脚本, 列出所有的需要diff文件列表
+# 使用方法./mkdiff.sh 
+
 diff_a_file()
 {
-  diff $1 $2 -q |grep differ |grep -v Makefile|awk '{\
+  diff $1 $2 -q |grep differ |grep -v Makefile|grep -v un~ \
+  |awk '{\
     split($2, old, "/"); \
     split($4, new, "/"); \
-    print "diff -U200", $2, $4, "| awk \" NR>3 {print}\" >", new[1]"-"old[1]"-"new[2]".diff"}'
+    print "diff -U200", $2, $4, "| awk \" NR>3 {print}\" >", new[1]"-"old[1]"-"new[2]".diff"\
+  }'
   echo
 }
 

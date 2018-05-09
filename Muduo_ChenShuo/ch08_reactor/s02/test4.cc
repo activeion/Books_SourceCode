@@ -27,7 +27,7 @@ void print(const char* msg)
 int main()
 {
   printTid();
-  muduo::EventLoop loop;
+  muduo::EventLoop loop; //内含TimerQueue成员变量 timers_
   g_loop = &loop;
 
   print("main");

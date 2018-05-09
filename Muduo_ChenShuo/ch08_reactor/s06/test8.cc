@@ -18,12 +18,44 @@ void onConnection(const muduo::TcpConnectionPtr& conn)
   }
 }
 
+/*
+TcpConnection::TcpConnection
+{
+
+  channel_->setReadCallback(
+      boost::bind(&TcpConnection::handleRead, this));//注意：这里没有使用shared_from_this()
+  ...
+}
+EventLoop::loop() ===> TcpConnection::handleRead()
+void TcpConnection::handleRead()                                                                
+{                                                                                          
+    char buf[65536];                                                                    
+    ssize_t n = ::read(channel_->fd(), buf, sizeof buf);                          
+    if (n > 0) {//这里，use_count=1，因为this被存入了TcpServer::connections_容器
+        // shared_from_this()返回一个右值，这个右值被一个conn左值引用绑定，延长了生命周期
+        messageCallback_(shared_from_this(), buf, n); // use_count=2: <1> 右值 <2> connections_
+            ===> void onMessage(TcpConnectionPtr& conn, const char* data, ssize_t len)// use_count=2; <1> conn <2> connections_
+        //messageCallback_()返回后，use_count依然等于1，因为TcpServer::connections_容器中该元素依然存在
+    } else if (n == 0) {
+        handleClose();
+            ===> closeCallback_(shared_from_this()) // use_count=2; <1> 右值 <2> connections_
+                ====> TcpServer::removeConnection(const TcpConnectionPtr& conn) //use_count=1 <1> 右值
+                    ===> loop_->queueInLoop(boost::bind(connectionDestroyed, conn)) // use_count=2 <1> 右值 <2> bind参数
+        //handleClose()返回, use_count=1, <1> pendingFunctors_
+        ===> functors.swap(pendingFunctors_);// functors析构, TcpConnection最终消亡
+    } else {
+        handleError();
+    }
+    ...
+}
+
+*/
 void onMessage(const muduo::TcpConnectionPtr& conn,
                const char* data,
                ssize_t len)
 {
-  printf("onMessage(): received %zd bytes from connection [%s]\n",
-         len, conn->name().c_str());
+  printf("onMessage(): received %zd bytes from connection [%s], conn.use_count()=%d\n",
+         len, conn->name().c_str(), conn.use_count()); // use_count=2
 }
 
 int main()
