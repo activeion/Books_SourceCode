@@ -19,13 +19,42 @@ void onConnection(const muduo::TcpConnectionPtr& conn)
 }
 
 /*
+1. 创建TcpConnection
 TcpConnection::TcpConnection
 {
 
   channel_->setReadCallback(
-      boost::bind(&TcpConnection::handleRead, this));//注意：这里没有使用shared_from_this()
+      boost::bind(&TcpConnection::handleRead, this));
+    //注意：这里没有使用shared_from_this(), 也不能使用
   ...
 }
+void TcpServer::newConnection(int sockfd, const InetAddress& peerAddr)
+{
+  loop_->assertInLoopThread();
+  char buf[32];
+  snprintf(buf, sizeof buf, "#%d", nextConnId_);
+  ++nextConnId_;
+  std::string connName = name_ + buf;
+
+  LOG_INFO << "TcpServer::newConnection [" << name_
+           << "] - new connection [" << connName
+           << "] from " << peerAddr.toHostPort();
+  InetAddress localAddr(sockets::getLocalAddr(sockfd));
+  // FIXME poll with zero timeout to double confirm the new connection
+  TcpConnectionPtr conn(
+      new TcpConnection(loop_, connName, sockfd, localAddr, peerAddr));
+    //创建了shared_ptr conn, use_count=1
+  connections_[connName] = conn;
+    //use_count=2
+  conn->setConnectionCallback(connectionCallback_);
+  conn->setMessageCallback(messageCallback_);
+  conn->setCloseCallback(
+      boost::bind(&TcpServer::removeConnection, this, _1));
+  conn->connectEstablished();
+}
+//use_count=1
+
+2. 使用和消亡
 EventLoop::loop() ===> TcpConnection::handleRead()
 void TcpConnection::handleRead()                                                                
 {                                                                                          
