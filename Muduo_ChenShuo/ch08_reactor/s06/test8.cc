@@ -5,14 +5,11 @@
 
 void onConnection(const muduo::TcpConnectionPtr& conn)
 {
-  if (conn->connected())
-  {
+  if (conn->connected()) {
     printf("onConnection(): new connection [%s] from %s\n",
            conn->name().c_str(),
            conn->peerAddress().toHostPort().c_str());
-  }
-  else
-  {
+  } else {
     printf("onConnection(): connection [%s] is down\n",
            conn->name().c_str());
   }
@@ -46,7 +43,7 @@ void TcpServer::newConnection(int sockfd, const InetAddress& peerAddr)
     //创建了shared_ptr conn, use_count=1
   connections_[connName] = conn;
     //use_count=2
-  conn->setConnectionCallback(connectionCallback_);
+  conn->setConnectionCallback(connectionCallback_); // void ::onConnection() --> "up"
   conn->setMessageCallback(messageCallback_);
   conn->setCloseCallback(
       boost::bind(&TcpServer::removeConnection, this, _1));

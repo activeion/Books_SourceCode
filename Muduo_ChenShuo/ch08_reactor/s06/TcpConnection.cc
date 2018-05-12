@@ -58,11 +58,11 @@ void TcpConnection::connectEstablished()
   setState(kConnected);
   channel_->enableReading();
   //这里的shared_from_this()返回一个右值. 
-  //connectionCallback_=boost::bind(TcpServer::removeConnection, this)
-  //因此右值被绑定到TcpServer::removeConnection的形参cont TcpConnectionPtr& conn这个左值引用上了。
+  //connectionCallback_=boost::bind(TcpServer::connectionCallback_, this)=::onConnection(...)
+  //因此右值被绑定到::onConnection的形参cont TcpConnectionPtr& conn这个左值引用上了。
   //注意：右值并没有被放入函数对象connectionCallback_中去！
-  connectionCallback_(shared_from_this());
-  //程序运行到这里，this的引用计数仅仅为1，即pendingFunctors容器的成员boost::function的参数
+  connectionCallback_(shared_from_this());//void ::onConnection(const TcpConnectionPtr& conn)
+  //调用结束之后，程序运行到这里，this的引用计数仅仅为1，即pendingFunctors容器的成员boost::function的参数
 }
 
 void TcpConnection::connectDestroyed()
