@@ -11,7 +11,7 @@
 #include <muduo/base/noncopyable.h>
 
 #include <muduo/base/Timestamp.h>
-#include "thread/Atomic.h"
+#include <muduo/base/Atomic.h>
 #include "Callbacks.h"
 
 namespace muduo

@@ -1,4 +1,17 @@
-SUBDIRS = s00 s01 s02 s03 s04 s05 s06 s07 s08 s09 s10
+SUBDIRS = s00_EventLoop \
+	  s01_timerfd \
+	  s00_TimerQueue \
+	  s03_runInLoop \
+	  s04_Acceptor \
+	  s05_TcpConnection \
+	  s06_TcpConnection \
+	  s07_Buffer \
+	  s08_send \
+	  s09_SIGPIPE \
+	  s10_multithread \
+	  s11_Connector \
+	  s12_TcpClient \
+	  s13_epoll
 
 all: $(SUBDIRS)
 
