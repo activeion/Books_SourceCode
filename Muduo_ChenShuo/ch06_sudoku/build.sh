@@ -10,6 +10,7 @@ BUILD_NO_EXAMPLES=${BUILD_NO_EXAMPLES:-0}
 
 mkdir -p $BUILD_DIR/$BUILD_TYPE-cpp11 \
   && cd $BUILD_DIR/$BUILD_TYPE-cpp11 \
+  && cp ../../req.txt . \
   && cmake \
            -DCMAKE_BUILD_TYPE=$BUILD_TYPE \
            -DCMAKE_INSTALL_PREFIX=$INSTALL_DIR \
