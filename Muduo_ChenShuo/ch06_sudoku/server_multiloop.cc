@@ -18,21 +18,21 @@ using namespace muduo::net;
 class SudokuServer
 {
  public:
-  SudokuServer(EventLoop* loop, const InetAddress& listenAddr, int numThreads)
+  SudokuServer(EventLoop* loop, const InetAddress& listenAddr, int numEventloops)
     : server_(loop, listenAddr, "SudokuServer"),
-      numThreads_(numThreads),
+      numEventloops_(numEventloops),
       startTime_(Timestamp::now())
   {
     server_.setConnectionCallback(
         std::bind(&SudokuServer::onConnection, this, _1));
     server_.setMessageCallback(
         std::bind(&SudokuServer::onMessage, this, _1, _2, _3));
-    server_.setThreadNum(numThreads);
+    server_.setThreadNum(numEventloops);
   }
 
   void start()
   {
-    LOG_INFO << "starting " << numThreads_ << " threads.";
+    LOG_INFO << "starting " << numEventloops_ << " threads.";
     server_.start();
   }
 
@@ -114,21 +114,21 @@ class SudokuServer
   }
 
   TcpServer server_;
-  int numThreads_;
+  int numEventloops_;
   Timestamp startTime_;
 };
 
 int main(int argc, char* argv[])
 {
   LOG_INFO << "pid = " << getpid() << ", tid = " << CurrentThread::tid();
-  int numThreads = 0;
+  int numEventloops = 0;
   if (argc > 1)
   {
-    numThreads = atoi(argv[1]);
+    numEventloops = atoi(argv[1]);
   }
   EventLoop loop;
   InetAddress listenAddr(9981);
-  SudokuServer server(&loop, listenAddr, numThreads);
+  SudokuServer server(&loop, listenAddr, numEventloops);
 
   server.start();
 
