@@ -141,7 +141,7 @@ class SudokuClient : noncopyable
       LOG_INFO << name_ << " done.";
       double elapsed = timeDifference(Timestamp::now(), start_);
       cb_(name_, elapsed, count_);
-      conn->shutdown();
+      conn->shutdown();//客户端自行退出，比较礼貌.
     }
   }
 
@@ -195,10 +195,10 @@ void runClient(std::istream& in, const InetAddress& serverAddr, int conn)
 
 int main(int argc, char* argv[])
 {
-  int conn = 1;
+  int conn = 2;
   InetAddress serverAddr("127.0.0.1", 9981);
-  const char* input = NULL;
-  bool local = true;
+  const char* input = "req.txt";//NULL;
+  bool local = false; //true;
   switch (argc)
   {
     case 4:
@@ -212,8 +212,8 @@ int main(int argc, char* argv[])
       input = argv[1];
       break;
     default:
-      printf("Usage: %s input server_ip [connections]\n", argv[0]);
-      return 0;
+      //printf("Usage: %s input server_ip [connections]\n", argv[0]);
+      break;//return 0;
   }
 
   std::ifstream in(input);

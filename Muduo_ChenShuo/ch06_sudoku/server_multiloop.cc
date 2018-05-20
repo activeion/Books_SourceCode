@@ -121,7 +121,7 @@ class SudokuServer
 int main(int argc, char* argv[])
 {
   LOG_INFO << "pid = " << getpid() << ", tid = " << CurrentThread::tid();
-  int numEventloops = 0;
+  int numEventloops = 2; //默认TcpConnection线程为2，方便cgdb调试，不需要再set args 2。原始版本为0
   if (argc > 1)
   {
     numEventloops = atoi(argv[1]);

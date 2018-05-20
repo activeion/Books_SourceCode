@@ -168,8 +168,8 @@ int main(int argc, char* argv[])
 {
   LOG_INFO << argv[0] << " [number of IO threads] [number of worker threads] [-n]";
   LOG_INFO << "pid = " << getpid() << ", tid = " << CurrentThread::tid();
-  int numEventLoops = 0;
-  int numThreads = 0;
+  int numEventLoops = 2;
+  int numThreads = 2;
   bool nodelay = false;
   if (argc > 1)
   {

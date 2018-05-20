@@ -119,6 +119,7 @@ class SudokuServer
     {
       conn->send(id+":"+result+"\r\n");
     }
+    //conn->shutdown();//server主动关闭连接比较野蛮.
   }
 
   TcpServer server_;
@@ -130,7 +131,7 @@ class SudokuServer
 int main(int argc, char* argv[])
 {
   LOG_INFO << "pid = " << getpid() << ", tid = " << CurrentThread::tid();
-  int numThreads = 0;
+  int numThreads = 2; //默认线程池线程数为2; 方便cgdb，不必set args 2了。原始版本为0
   if (argc > 1)
   {
     numThreads = atoi(argv[1]);
