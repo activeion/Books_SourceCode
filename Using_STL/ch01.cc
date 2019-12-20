@@ -177,3 +177,38 @@ int main(void)
 
     return 0;
 }
+
+/****
+
+  Enter values separated by one or more spaces. Enter Ctrl+D to end; 
+  342 2 54 24 65 89 2222
+  The average is 399.714
+  to be or not to be
+  3.5
+  3.5
+  The array contains:
+  2.5 4.5 6.5 5.5 8.5 
+  The sum of the array elements is 27.5
+  Enter numeric values separated by spaces and enter Ctrl+D to end:
+  342 2 54 24 65 89 2222
+
+  The sum of the values you entered is 2798
+
+
+  The original data is: 
+  1.5 2.5 3.5 4.5 5.5 
+
+  Square roots are:
+  1.22474 1.58114 1.87083 2.12132 2.34521 
+
+  Cubes are:
+  3.375 15.625 42.875 91.125 166.375 
+
+  Squares are:
+  2.25 6.25 12.25 20.25 30.25 
+
+  4th powers are:
+  5.0625 39.0625 150.062 410.062 915.062 
+
+
+  ***/
