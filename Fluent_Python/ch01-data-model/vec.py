@@ -5,7 +5,8 @@ class Vector:
         self.x = x;
         self.y = y;
     def __repr__(self):
-        return 'Vector(%r, %r)' %(self.x, self.y)
+        #return 'Vector(%r, %r)' %(self.x, self.y)
+        return f'Vector({self.x}, {self.y})'
     def __abs__(self):
         return hypot(self.x, self.y)
     def __add__(self, other):
@@ -19,6 +20,7 @@ class Vector:
 
 v1=Vector(1,2)
 v2 = Vector(3,4)
+print(v1+v2)
 print(v1*3)
 print(4*v1)
 
