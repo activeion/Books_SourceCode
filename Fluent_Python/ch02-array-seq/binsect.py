@@ -1,13 +1,6 @@
 import bisect
 import sys
 
-HAYSTACK = [1, 4, 5, 6, 8, 12, 15, 20, 21, 23, 23, 26, 29, 30]
-NEEDLES = [0, 1, 2, 5, 8, 10, 22, 23, 29, 30, 31]
-
-ROW_FMT = '{0:2d} @ {1:2d}    {2}{0:3d}'
-
-scores = [33, 99, 77, 70, 89, 90, 100, 101, -1, 60]
-breakpoints = [60, 70, 80, 90]
 
 def halfsearch(ar, target):
     lo=0
@@ -51,6 +44,8 @@ def halfsearch_d(ar, target): #following halfsearch() & bisect_right
     return lo
 
 def demo(bisect_fn):
+    NEEDLES = [0, 1, 2, 5, 8, 10, 22, 23, 29, 30, 31] # pos of '|'
+    ROW_FMT = '{0:2d} @ {1:2d}    {2}{0:3d}' # format of line head
     for needle in reversed(NEEDLES):
         position = bisect_fn(HAYSTACK, needle)
         offset = position*"  |"
@@ -68,17 +63,24 @@ if __name__ == '__main__':
     elif sys.argv[-1] == 'halfsearch':
         bisect_fn = halfsearch
     elif sys.argv[-1] == 'halfsearch_d':
-        HAYSTACK =[x for x in reversed(HAYSTACK)]
-        breakpoints = [x for x in reversed(breakpoints)]
         bisect_fn = halfsearch_d
     else:
         bisect_fn = bisect.bisect
 
+    HAYSTACK = [1, 4, 5, 6, 8, 12, 15, 20, 21, 23, 23, 26, 29, 30]
+    if sys.argv[-1] == 'halfsearch_d':
+        HAYSTACK =[x for x in reversed(HAYSTACK)]
     print('DEMO:', bisect_fn.__name__)
     print('index    ->', ' '.join('%2d' % n for n in range(len(HAYSTACK)+1)))
     print('haystack ->', ' '.join('%2d' % n for n in HAYSTACK))
     demo(bisect_fn)
 
+    print('------------------')
+
+    scores = [33, 99, 77, 70, 89, 90, 100, 101, -1, 60]
+    breakpoints = [60, 70, 80, 90]
+    if sys.argv[-1] == 'halfsearch_d':
+        breakpoints = [x for x in reversed(breakpoints)]
     print(scores)
     print([grade(bisect_fn,score,breakpoints) for score in scores]) 
 
