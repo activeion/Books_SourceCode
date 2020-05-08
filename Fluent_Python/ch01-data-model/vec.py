@@ -23,4 +23,3 @@ v2 = Vector(3,4)
 print(v1+v2)
 print(v1*3)
 print(4*v1)
-
