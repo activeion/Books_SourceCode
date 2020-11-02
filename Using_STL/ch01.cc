@@ -149,17 +149,20 @@ int main(void)
         std::cout<<"\n\nThe original data is: " << std::endl;
         std::copy(std::begin(data), std::end(data),
                 std::ostream_iterator<double>{std::cout, " "});
+
         // Passing a function object
         Root root;
         std::cout << "\n\nSquare roots are:" << std::endl;
         std::transform(std::begin(data), std::end(data),
                 std::ostream_iterator<double>(std::cout, " "), 
                 root);
+
         // Using an lambda expression as an argument
         std::cout << "\n\nCubes are:" << std::endl;
         std::transform(std::begin(data), std::end(data),
                 std::ostream_iterator<double>(std::cout, " "), 
                 [](double x){return x*x*x; });
+
         // Using a variable of type std::function<> as argument
         std::function<double(double)> op {[](double x){ return x*x; }};
         std::cout << "\n\nSquares are:" << std::endl;
