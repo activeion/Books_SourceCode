@@ -56,7 +56,7 @@ def grade(bisect_fn, score, breakpoints , grades='FDCBA'):
     return grades[i]
 
 if __name__ == '__main__':
-    if sys.argv[-1] == 'left':
+    if sys.argv[-1] == 'left' or sys.argv[-1] == 'left_d':
         bisect_fn = bisect.bisect_left
     elif sys.argv[-1] == 'halfsearch_left':
         bisect_fn = halfsearch_left
@@ -68,7 +68,7 @@ if __name__ == '__main__':
         bisect_fn = bisect.bisect
 
     HAYSTACK = [1, 4, 5, 6, 8, 12, 15, 20, 21, 23, 23, 26, 29, 30]
-    if sys.argv[-1] == 'halfsearch_d':
+    if sys.argv[-1] == 'halfsearch_d' or sys.argv[-1] == 'left_d' or sys.argv[-1]=='right_d':
         HAYSTACK =[x for x in reversed(HAYSTACK)]
     print('DEMO:', bisect_fn.__name__)
     print('index    ->', ' '.join('%2d' % n for n in range(len(HAYSTACK)+1)))

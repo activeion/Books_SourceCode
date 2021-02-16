@@ -41,6 +41,7 @@ int main(void)
 {
     {//10.2.1 std::iota()
         {
+            std::vector<double> test{9};
             std::vector<double> data(9);//T=double, T必须支持operator++()
             double initial{-2.5};
             std::iota(std::begin(data),std::end(data),initial);
