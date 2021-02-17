@@ -41,7 +41,7 @@ namespace jizh02
     class Array
     {
     private:
-        T *elements;
+        T *elements; //注意：本Array的委托关系和std::array的组合关系并不相同
         size_t count;
 
     public:
@@ -72,11 +72,7 @@ namespace jizh02
 
     template <typename T>
     Array<T>::Array(const Array &other)
-    try : elements
-    {
-        new T(other.count)
-    }
-    , count{other.count}
+    try : elements{new T(other.count)}, count{other.count}
     {
         for (int i = 0; i < other.count; ++i)
         {
@@ -97,6 +93,7 @@ namespace jizh02
 
     template <typename T>
     using sptr = std::shared_ptr<T>;
+
     void test(void)
     { // 1.2 模板
         std::string first{"to be or not to be"};
@@ -113,12 +110,10 @@ namespace jizh02
         using std::string;
         sptr<string> s;
     }
-
 } // namespace jizh02
 
 namespace jizh02container
 {
-
     //能够放入容器的对象, must be swappable
     class T
     {
@@ -167,7 +162,6 @@ namespace jizh02Iterators
 
 namespace jizh08
 {
-
     class Root
     {
     public:
@@ -249,7 +243,6 @@ int main(void)
   342 2 54 24 65 89 2222
 
   The sum of the values you entered is 2798
-
 
   The original data is: 
   1.5 2.5 3.5 4.5 5.5 
