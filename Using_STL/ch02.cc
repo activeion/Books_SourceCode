@@ -13,23 +13,25 @@ static void cin_state(void)
 #include <limits>
 static void cin_clear(void)
 {
-  std::cout << " => before clear(), peek="<<std::cin.peek() << " :";
+  // be careful, peek() may lead to eofbit=1 if peek() returns -1/EOF
+  //std::cout << " => before clear(), peek="<<std::cin.peek() << ": ";
+  std::cout << " => before clear(): ";
   cin_state();
 
   std::cin.clear(); // -- lead to goodbit
 
-  std::cout << " after clear(): ";
+  //std::cout << "     after clear(), peek=" << std::cin.peek() << ": ";
+  std::cout << "     after clear(): ";
   cin_state();
-
 }
 namespace jizh01
 {
   // Ex2_01.cpp
   /*
-Using array<T,N> to create a Body Mass Index (BMI) table
-BMI = weight/(height*height)
-weight is in kilograms, height is in meters
-*/
+    Using array<T,N> to create a Body Mass Index (BMI) table
+    BMI = weight/(height*height)
+    weight is in kilograms, height is in meters
+  */
 
   void test(void)
   {
@@ -142,7 +144,7 @@ namespace jizh02
 
   void test(void)
   {
-    cin_clear();
+    //cin_clear();
 
     vector<string> words; // Stores words to be sorted
     words.reserve(10);    // Allocate some space for elements
@@ -239,15 +241,11 @@ namespace jizh04
   void test(void)
   {
     std::deque<string> names;
-    std::cout << "Enter first names separated by spaces. Enter Ctrl+Z on a new line to end:\n";
-    std::cout << std::endl;
+    std::cout << "Enter first names separated by spaces. Enter Ctrl+Z on a new line to end:" << std::endl;
 
     cin_clear();
     //std::cin.ignore(1024, '\n');
     //std::cin.sync();
-    std::cin.ignore();
-    std::cin.ignore();
-    cin_clear();
 
     std::copy(std::istream_iterator<string>{std::cin},
               std::istream_iterator<string>{},

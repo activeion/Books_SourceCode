@@ -10,6 +10,9 @@ using std::endl;
 using std::string;
 
 int main() {
+    std::ios::sync_with_stdio(false);
+    std::cin.tie(0);
+
     vector<string> vec;
     string str;
     cout << "Please enter some string..." << endl;
