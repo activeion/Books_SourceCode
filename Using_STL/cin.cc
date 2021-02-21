@@ -2,10 +2,11 @@
 #include <iostream>
 #include <sstream>
 #include <vector>
+#include <iterator>
 using namespace std;
 
 template <typename T>
-void cin_fill(std::vector<T>& vec)
+void cin_fill(std::back_insert_iterator<T> bit)
 {
     string line;
     while (true)
@@ -16,11 +17,11 @@ void cin_fill(std::vector<T>& vec)
             istringstream ss{line};
             for (;;)
             {
-                T n;
+                typename T::value_type n;
                 ss >> n;
                 if (!ss)
                     break;
-                vec.push_back(n);
+                bit = n;
             }
         } else break;
     }
@@ -30,18 +31,17 @@ void cin_fill(std::vector<T>& vec)
 int main(void)
 {
     {
-    vector<int> vec;
-    cin_fill(vec);
-    std::copy(std::cbegin(vec), std::cend(vec), std::ostream_iterator<int>{std::cout, " "});
-    std::cout << std::endl;
+        vector<int> vec;
+        cin_fill(std::back_inserter(vec));
+        std::copy(std::cbegin(vec), std::cend(vec), std::ostream_iterator<int>{std::cout, " "});
+        std::cout << std::endl;
     }
     {
-    vector<std::string> vec;
-    cin_fill(vec);
-    std::copy(std::cbegin(vec), std::cend(vec), std::ostream_iterator<std::string>{std::cout, " "});
-    std::cout << std::endl;
+        vector<std::string> vec;
+        cin_fill(std::back_inserter(vec));
+        std::copy(std::cbegin(vec), std::cend(vec), std::ostream_iterator<std::string>{std::cout, " "});
+        std::cout << std::endl;
     }
-
 
     return 0;
 }
