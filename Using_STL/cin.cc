@@ -4,10 +4,9 @@
 #include <vector>
 using namespace std;
 
-int main(void)
+template <typename T>
+void cin_fill(std::vector<T>& vec)
 {
-    vector<int> vec;
-
     string line;
     while (true)
     {
@@ -17,7 +16,7 @@ int main(void)
             istringstream ss{line};
             for (;;)
             {
-                int n;
+                T n;
                 ss >> n;
                 if (!ss)
                     break;
@@ -25,6 +24,24 @@ int main(void)
             }
         } else break;
     }
+}
+#include <algorithm>
+#include <iterator>
+int main(void)
+{
+    {
+    vector<int> vec;
+    cin_fill(vec);
+    std::copy(std::cbegin(vec), std::cend(vec), std::ostream_iterator<int>{std::cout, " "});
+    std::cout << std::endl;
+    }
+    {
+    vector<std::string> vec;
+    cin_fill(vec);
+    std::copy(std::cbegin(vec), std::cend(vec), std::ostream_iterator<std::string>{std::cout, " "});
+    std::cout << std::endl;
+    }
+
 
     return 0;
 }
