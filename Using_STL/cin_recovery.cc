@@ -100,7 +100,7 @@ void cin_fill(std::back_insert_iterator<T> bit)
         //如果std::cin没有失效，下面两句和上面一句效果相同
         //现在std::cin已经失效了，故只能使用ifstream再次连接一次stdin文件
         //但也丧失了可移植性
-        std::ifstream fin("/dev/stdin");
+        std::ifstream fin("/dev/stdin");//代替std::cin,用与在linux下面随时建立连接
         std::getline(fin, line);
         if (!line.empty())
         {

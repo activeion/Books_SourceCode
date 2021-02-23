@@ -111,6 +111,7 @@ namespace jizh01
 #include <algorithm> // For swap() and copy() functions
 #include <vector> // For vector (and iterators)
 #include <iterator> // For front_insert_iterator & stream iterators
+#include <fstream>
 
 namespace jizh02
 {
@@ -144,12 +145,12 @@ namespace jizh02
 
   void test(void)
   {
-    //cin_clear();
 
     vector<string> words; // Stores words to be sorted
     words.reserve(10);    // Allocate some space for elements
+    std::ifstream fin("/dev/stdin");
     std::cout << "Enter words separated by spaces. Enter Ctrl+Z on a separate line to end:" << std::endl;
-    std::copy(std::istream_iterator<string>{std::cin},
+    std::copy(std::istream_iterator<string>{fin/*std::cin*/},
               std::istream_iterator<string>{},
               std::back_inserter(words));
 
@@ -242,12 +243,10 @@ namespace jizh04
   {
     std::deque<string> names;
     std::cout << "Enter first names separated by spaces. Enter Ctrl+Z on a new line to end:" << std::endl;
+    
+    std::ifstream fin("/dev/stdin");
 
-    cin_clear();
-    //std::cin.ignore(1024, '\n');
-    //std::cin.sync();
-
-    std::copy(std::istream_iterator<string>{std::cin},
+    std::copy(std::istream_iterator<string>{fin},
               std::istream_iterator<string>{},
               std::front_inserter(names));
     std::cout << "\nIn reverse order, the names you entered are:\n";
@@ -283,11 +282,12 @@ namespace jizh05
     // Read the proverbs
     std::cout << "Enter a few proverbs and enter an empty line to end:" << std::endl;
     string proverb;
-    while (getline(std::cin, proverb, '\n'), !proverb.empty())
+    std::ifstream fin("/dev/stdin");
+    while (getline(fin/*std::cin*/, proverb, '\n'), !proverb.empty())
       proverbs.push_front(proverb);
 
     std::cout << "Go on, just one more:" << std::endl;
-    getline(std::cin, proverb, '\n');
+    getline(fin/*std::cin*/, proverb, '\n');
     proverbs.emplace_back(proverb);
 
     std::cout << "The elements in the list in reverse order are:" << std::endl;
@@ -306,19 +306,19 @@ namespace jizh05
 int main(void)
 {
   std::cout << "-----------" << std::endl;
-  //jizh01::test();
+  jizh01::test();
 
   std::cout << "-----------" << std::endl;
   jizh02::test();
 
   std::cout << "-----------" << std::endl;
-  //jizh03::test();
+  jizh03::test();
 
   std::cout << "-----------" << std::endl;
   jizh04::test();
 
   std::cout << "-----------" << std::endl;
-  //jizh05::test();
+  jizh05::test();
 
   return 0;
 }
